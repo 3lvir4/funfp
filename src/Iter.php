@@ -16,8 +16,9 @@ use Throwable;
  * @template TKey
  * @template TVal
  * @implements IteratorAggregate<TKey, TVal>
+ * @implements IterOps<TKey, TVal>
  */
-class Iter implements \Countable, IteratorAggregate
+class Iter implements \Countable, IteratorAggregate, IterOps
 {
     /**
      * @use IterTrait<TKey, TVal>
@@ -34,9 +35,9 @@ class Iter implements \Countable, IteratorAggregate
     /**
      * @template U
      * @param U $value
-     * @return RepeatIter<U>
+     * @return IterOps<int, U>
      */
-    public static function repeat(mixed $value): RepeatIter
+    public static function repeat(mixed $value): IterOps
     {
         return new RepeatIter(static fn() => $value);
     }
@@ -45,9 +46,9 @@ class Iter implements \Countable, IteratorAggregate
      * Returns an iterator that yields the result of the given callback infinitely.
      * @template T
      * @param callable(): T $f
-     * @return RepeatIter<T>
+     * @return IterOps<int, T>
      */
-    public static function repeatWith(callable $f): RepeatIter
+    public static function repeatWith(callable $f): IterOps
     {
         return new RepeatIter($f);
     }
@@ -56,9 +57,9 @@ class Iter implements \Countable, IteratorAggregate
      * @template T
      * @param T $initialValue
      * @param callable(T): T $genFn
-     * @return GenerateIter<T>
+     * @return IterOps<int, T>
      */
-    public static function generate($initialValue, callable $genFn): GenerateIter
+    public static function generate($initialValue, callable $genFn): IterOps
     {
         return new GenerateIter($initialValue, $genFn);
     }
@@ -67,11 +68,11 @@ class Iter implements \Countable, IteratorAggregate
      * @template UKey
      * @template UVal
      * @param iterable<UKey, UVal> $iterable
-     * @return Iter<UKey, UVal>
+     * @return IterOps<UKey, UVal>
      * @throws Exception
      * @psalm-suppress InvalidReturnStatement, InvalidReturnType
      */
-    public static function fromIterable(iterable $iterable): Iter
+    public static function fromIterable(iterable $iterable): IterOps
     {
         if (is_array($iterable))
             return new Iter(new ArrayIterator($iterable));

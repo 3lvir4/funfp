@@ -6,7 +6,7 @@ namespace Elvir4\FunFp\constructors;
 
 use Elvir4\FunFp\Helpers\String\BytesStringIterator;
 use Elvir4\FunFp\Helpers\String\Utf8StringIterator;
-use Elvir4\FunFp\Iter\CycleIter;
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\Iter\GenerateIter;
 use Elvir4\FunFp\Iter\RepeatIter;
 use Elvir4\FunFp\Iter;
@@ -41,7 +41,7 @@ function pipe(callable ...$functions): Pipe
  * @template TKey
  * @template TVal
  * @param iterable<TKey, TVal> $iterable
- * @return Result<Iter<TKey, TVal>, Throwable>
+ * @return Result<IterOps<TKey, TVal>, Throwable>
  */
 function iter(iterable $iterable): Result
 {
@@ -52,9 +52,9 @@ function iter(iterable $iterable): Result
  * Returns an iterator that yields the result of the given callback infinitely.
  * @template T
  * @param callable(): T $f
- * @return RepeatIter<T>
+ * @return IterOps<int, T>
  */
-function repeatWith(callable $f): RepeatIter
+function repeatWith(callable $f): IterOps
 {
     return new RepeatIter($f);
 }
@@ -63,9 +63,9 @@ function repeatWith(callable $f): RepeatIter
  * @template T
  * @param T $initialValue
  * @param callable(T): T $genFn
- * @return GenerateIter<T>
+ * @return IterOps<int, T>
  */
-function generate($initialValue, callable $genFn): GenerateIter
+function generate($initialValue, callable $genFn): IterOps
 {
     return new GenerateIter($initialValue, $genFn);
 }
@@ -74,7 +74,7 @@ function generate($initialValue, callable $genFn): GenerateIter
  * @template TKey
  * @template TVal
  * @param iterable<TKey, TVal> $iterable
- * @return Result<CycleIter<TKey, TVal>, Throwable>
+ * @return Result<IterOps<TKey, TVal>, Throwable>
  */
 function cycle(iterable $iterable): Result
 {
@@ -83,18 +83,18 @@ function cycle(iterable $iterable): Result
 
 /**
  * @param string $str
- * @return Iter<int, int>
+ * @return IterOps<int, int>
  */
-function bytes(string $str): Iter
+function bytes(string $str): IterOps
 {
     return new Iter(new BytesStringIterator($str));
 }
 
 /**
  * @param string $str
- * @return Iter<int, string>
+ * @return IterOps<int, string>
  */
-function chars(string $str): Iter
+function chars(string $str): IterOps
 {
     return new Iter(new Utf8StringIterator($str));
 }

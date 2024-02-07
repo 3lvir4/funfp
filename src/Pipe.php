@@ -6,9 +6,9 @@ namespace Elvir4\FunFp;
 
 /**
  * @psalm-suppress MixedAssignment
- * @implements ProvidesIter<int, callable>
+ * @implements ProvidesIterOps<int, callable>
  */
-final class Pipe implements ProvidesIter
+final class Pipe implements ProvidesIterOps
 {
     /**
      * @param callable[] $fns
@@ -50,7 +50,7 @@ final class Pipe implements ProvidesIter
      * @inheritDoc
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    #[\Override] public function iter(): Iter
+    #[\Override] public function iter(): IterOps
     {
         return new Iter(new \ArrayIterator($this->fns));
     }

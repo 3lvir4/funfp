@@ -12,12 +12,12 @@ use Elvir4\FunFp\Option;
  */
 final class None extends Option
 {
+    /**
+     * @var Option|null
+     */
     protected static ?Option $instance = null;
     protected function __construct() {}
 
-    /**
-     * @return Option<mixed>
-     */
     protected static function getInstance(): Option
     {
         return self::$instance === null

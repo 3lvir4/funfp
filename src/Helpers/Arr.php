@@ -4,21 +4,23 @@ namespace Elvir4\FunFp\Helpers;
 
 use ArrayIterator;
 use Elvir4\FunFp\Iter;
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\Option;
 use Elvir4\FunFp\Pipe;
-use Elvir4\FunFp\ProvidesIter;
+use Elvir4\FunFp\ProvidesIterOps;
 use IteratorAggregate;
+use Override;
 use Traversable;
 
 /**
  * Immutable array wrapper.
  * @template TVal
  * @implements IteratorAggregate<TVal>
- * @implements ProvidesIter<array-key, TVal>
+ * @implements ProvidesIterOps<array-key, TVal>
  * @psalm-suppress MixedReturnTypeCoercion, MixedArgumentTypeCoercion, ImpureMethodCall, ImpureFunctionCall
  * @psalm-immutable
  */
-class Arr implements IteratorAggregate, ProvidesIter
+class Arr implements IteratorAggregate, ProvidesIterOps
 {
     /**
      * @param array<TVal> $array
@@ -59,7 +61,7 @@ class Arr implements IteratorAggregate, ProvidesIter
     /**
      * @inheritDoc
      */
-    #[\Override] public function iter(): Iter
+    #[Override] public function iter(): IterOps
     {
         return new Iter(new ArrayIterator($this->array));
     }
@@ -164,7 +166,7 @@ class Arr implements IteratorAggregate, ProvidesIter
     /**
      * @inheritDoc
      */
-    #[\Override] public function getIterator(): Traversable
+    #[Override] public function getIterator(): Traversable
     {
         return new ArrayIterator($this->array);
     }

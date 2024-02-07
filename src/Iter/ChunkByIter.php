@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elvir4\FunFp\Iter;
 
 use Closure;
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 use function Amp\call;
@@ -13,9 +14,11 @@ use function Amp\call;
  * @template TKey
  * @template TVal
  * @implements Iterator<int, array<TKey, TVal>>
+ * @implements IterOps<int, array<TKey, TVal>>
  * @psalm-suppress all
+ * @internal
  */
-class ChunkByIter implements Iterator
+class ChunkByIter implements Iterator, IterOps
 {
     /**
      * @use IterTrait<int, array<TKey, TVal>>
@@ -143,7 +146,7 @@ class ChunkByIter implements Iterator
     /**
      * @inheritDoc
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elvir4\FunFp\Iter;
 
 use Closure;
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 use IteratorIterator;
@@ -13,8 +14,10 @@ use IteratorIterator;
  * @template TKey
  * @template TVal
  * @extends IteratorIterator<TKey, TVal, Iterator<TKey, TVal>>
+ * @implements IterOps<TKey, TVal>
+ * @internal
  */
-class SortedIter extends IteratorIterator
+class SortedIter extends IteratorIterator implements IterOps
 {
     /**
      * @use IterTrait<TKey, TVal>
@@ -45,7 +48,7 @@ class SortedIter extends IteratorIterator
      * @inheritDoc
      * @psalm-suppress InvalidReturnStatement, InvalidReturnType, MixedArgumentTypeCoercion
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         if ($this->preserveKeys) {
             return new \ArrayIterator($this->toSortedArray($this->comparator));

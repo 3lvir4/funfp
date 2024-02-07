@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\Iter;
 
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 use Closure;
@@ -12,9 +13,11 @@ use Closure;
  * @template TKey
  * @template TVal
  * @implements Iterator<TKey, TVal>
+ * @implements IterOps<TKey, TVal>
  * @psalm-suppress MixedAssignment
+ * @internal
  */
-class DedupByIter implements Iterator
+class DedupByIter implements Iterator, IterOps
 {
     /**
      * @use IterTrait<TKey, TVal>
@@ -104,7 +107,7 @@ class DedupByIter implements Iterator
     /**
      * @inheritDoc
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

@@ -7,6 +7,7 @@ namespace Elvir4\FunFp\Iter;
 use CallbackFilterIterator;
 use Closure;
 use Countable;
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 
@@ -14,8 +15,10 @@ use Iterator;
  * @template TKey
  * @template TVal
  * @extends CallbackFilterIterator<TKey, TVal, Iterator<TKey, TVal>>
+ * @implements IterOps<TKey, TVal>
+ * @internal
  */
-class FilterIter extends CallbackFilterIterator implements Countable
+class FilterIter extends CallbackFilterIterator implements Countable, IterOps
 {
     /**
      * @use IterTrait<TKey, TVal>
@@ -34,7 +37,7 @@ class FilterIter extends CallbackFilterIterator implements Countable
     /**
      * @inheritDoc
      */
-    #[\Override] protected function getIter(): Iterator
+    #[\Override] public function getIter(): Iterator
     {
         return $this;
     }

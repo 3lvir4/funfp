@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\Iter;
 
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 
@@ -13,9 +14,11 @@ use Iterator;
  * @template UKey
  * @template UVal
  * @implements Iterator<list{TKey, UKey}, list{TVal, UVal}>
+ * @implements IterOps<list{TKey, UKey}, list{TVal, UVal}>
  * @psalm-suppress all
+ * @internal
  */
-class ZipIter implements Iterator, \Countable
+class ZipIter implements Iterator, \Countable, IterOps
 {
     /**
      * @use IterTrait<list{TKey, UKey}, list{TVal, UVal}>
@@ -88,7 +91,7 @@ class ZipIter implements Iterator, \Countable
     /**
      * @inheritDoc
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Elvir4\FunFp\Iter;
 
 use Closure;
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 
 /**
  * @template TVal
  * @implements Iterator<int, TVal>
+ * @implements IterOps<int, TVal>
  * @psalm-suppress all
+ * @internal
  */
-class GenerateIter implements Iterator
+class GenerateIter implements Iterator, IterOps
 {
     /**
      * @use IterTrait<int, TVal>
@@ -104,7 +107,7 @@ class GenerateIter implements Iterator
     /**
      * @inheritDoc
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

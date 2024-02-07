@@ -39,6 +39,7 @@ use function usort;
 /**
  * @template TKey
  * @template TVal
+ * @psalm-require-implements IterOps
  */
 trait IterTrait
 {
@@ -58,27 +59,27 @@ trait IterTrait
      * @template UKey
      * @template UVal
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): iterable<UKey, UVal> $f
-     * @return FlatMapIter<TKey, TVal, UKey, UVal>
+     * @return IterOps<TKey, UVal>
      */
-    public function flatMap(callable $f): FlatMapIter
+    public function flatMap(callable $f): IterOps
     {
         return new FlatMapIter($this->getIter(), $f);
     }
 
     /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
-     * @return FilterIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function filter(callable $predicate): FilterIter
+    public function filter(callable $predicate): IterOps
     {
         return new FilterIter($this->getIter(), $predicate);
     }
 
     /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
-     * @return FilterIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function reject(callable $predicate): FilterIter
+    public function reject(callable $predicate): IterOps
     {
         return new FilterIter(
             $this->getIter(),
@@ -92,53 +93,53 @@ trait IterTrait
     }
 
     /**
-     * @return ValuesIter<TKey, TVal>
+     * @return IterOps<int, TVal>
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function values(): ValuesIter
+    public function values(): IterOps
     {
         return new ValuesIter($this->getIter());
     }
 
     /**
-     * @return KeysIter<TKey, TVal>
+     * @return IterOps<int, TKey>
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function keys(): KeysIter
+    public function keys(): IterOps
     {
         return new KeysIter($this->getIter());
     }
 
     /**
-     * @return UniqueIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function unique(): UniqueIter
+    public function unique(): IterOps
     {
         return new UniqueIter($this->getIter());
     }
 
     /**
      * @param callable(TVal): mixed $f
-     * @return UniqueByIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function uniqueBy(callable $f): UniqueByIter
+    public function uniqueBy(callable $f): IterOps
     {
         return new UniqueByIter($this->getIter(), $f);
     }
 
     /**
-     * @return DedupIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function dedup(): DedupIter
+    public function dedup(): IterOps
     {
         return new DedupIter($this->getIter());
     }
 
     /**
      * @param callable(TVal): mixed $f
-     * @return DedupByIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function dedupBy(callable $f): DedupByIter
+    public function dedupBy(callable $f): IterOps
     {
         return new DedupByIter($this->getIter(), $f);
     }
@@ -146,19 +147,19 @@ trait IterTrait
     /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): mixed $f
      * @param bool $preserveKeys
-     * @return ChunkByIter<TKey, TVal>
+     * @return IterOps<int, array<TVal>>
      */
-    public function chunkBy(callable $f, bool $preserveKeys = false): ChunkByIter
+    public function chunkBy(callable $f, bool $preserveKeys = false): IterOps
     {
         return new ChunkByIter($this->getIter(), $f, $preserveKeys);
     }
 
     /**
      * @param Iterator<TKey, TVal>|Iter<TKey, TVal> ...$iterators
-     * @return ConcatIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function concat(Iterator|Iter ...$iterators): ConcatIter
+    public function concat(Iterator|Iter ...$iterators): IterOps
     {
         for ($i = 0; $i < count($iterators); $i++) {
             if ($iterators[$i] instanceof Iter) {
@@ -173,10 +174,10 @@ trait IterTrait
      * @template UKey
      * @template UVal
      * @param Iterator<UKey, UVal>|Iter<UKey, UVal> $iterator
-     * @return ZipIter<TKey, TVal, UKey, UVal>
-     * @psalm-suppress InvalidReturnType
+     * @return IterOps<list{TKey, UKey}, list{TVal, UVal}>
+     * @psalm-suppress InvalidReturnType, MoreSpecificReturnType
      */
-    public function zip(Iterator|Iter $iterator): ZipIter
+    public function zip(Iterator|Iter $iterator): IterOps
     {
         return new ZipIter(
             $this->getIter(),
@@ -188,46 +189,46 @@ trait IterTrait
 
     /**
      * @param Iterator|Iter ...$iterators
-     * @return ZipMultipleIter
+     * @return IterOps<array, array>
      */
-    public function zipMultiple(Iterator|Iter ...$iterators): ZipMultipleIter
+    public function zipMultiple(Iterator|Iter ...$iterators): IterOps
     {
         $g = static fn (Iterator|Iter $iter): Iterator => $iter instanceof Iter ? $iter->getIter() : $iter;
         return new ZipMultipleIter($this->getIter(), ...array_map($g, $iterators));
     }
 
     /**
-     * @return EnumerateIter<TKey, TVal>
+     * @return IterOps<TKey, list{int, TVal}>
      */
-    public function enumerate(): EnumerateIter
+    public function enumerate(): IterOps
     {
         return new EnumerateIter($this->getIter());
     }
 
     /**
      * @param int $n
-     * @return SkipIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function skip(int $n): SkipIter
+    public function skip(int $n): IterOps
     {
         return new SkipIter($this->getIter(), $n);
     }
 
     /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
-     * @return SkipWhileIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function skipWhile(callable $predicate): SkipWhileIter
+    public function skipWhile(callable $predicate): IterOps
     {
         return new SkipWhileIter($this->getIter(), $predicate);
     }
 
     /**
      * @param int $step
-     * @return SkipEveryIter<TKey, TVal>|EmptyIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function skipEvery(int $step): SkipEveryIter|EmptyIter
+    public function skipEvery(int $step): IterOps
     {
         if ($step === 1) return new EmptyIter();
         return new SkipEveryIter($this->getIter(), $step);
@@ -235,28 +236,28 @@ trait IterTrait
 
     /**
      * @param int $n
-     * @return TakeIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function take(int $n): TakeIter
+    public function take(int $n): IterOps
     {
         return new TakeIter($this->getIter(), $n);
     }
 
     /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
-     * @return TakeWhileIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function takeWhile(callable $predicate): TakeWhileIter
+    public function takeWhile(callable $predicate): IterOps
     {
         return new TakeWhileIter($this->getIter(), $predicate);
     }
 
     /**
      * @param int<0, max> $step
-     * @return TakeEveryIter<TKey, TVal>|EmptyIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function takeEvery(int $step): TakeEveryIter|EmptyIter
+    public function takeEvery(int $step): IterOps
     {
         if ($step === 0) return new EmptyIter();
         return new TakeEveryIter($this->getIter(), $step);
@@ -265,19 +266,19 @@ trait IterTrait
     /**
      * @param int $start
      * @param int $amount
-     * @return SliceIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function slice(int $start, int $amount = -1): SliceIter
+    public function slice(int $start, int $amount = -1): IterOps
     {
         return new SliceIter($this->getIter() ,$start, $amount);
     }
 
     /**
      * Flattens one level of an iterator of iterators.
-     * @return FlattenIter
+     * @return IterOps
      * @psalm-suppress MixedArgumentTypeCoercion
      */
-    public function flatten(): FlattenIter
+    public function flatten(): IterOps
     {
         return new FlattenIter($this->getIter());
     }
@@ -285,26 +286,26 @@ trait IterTrait
     /**
      * @param callable(TVal, TVal): int $comparator
      * @param bool $preserveKeys
-     * @return SortedIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function sorted(callable $comparator, bool $preserveKeys = true): SortedIter
+    public function sorted(callable $comparator, bool $preserveKeys = true): IterOps
     {
         return new SortedIter($this->getIter(), $comparator, $preserveKeys);
     }
 
     /**
-     * @return CycleIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function cycle(): CycleIter
+    public function cycle(): IterOps
     {
         return new CycleIter($this->getIter());
     }
 
     /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): void $f
-     * @return EachIter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function each(callable $f): EachIter
+    public function each(callable $f): IterOps
     {
         return new EachIter($this->getIter(), $f);
     }
@@ -630,6 +631,7 @@ trait IterTrait
     /**
      * @param callable(TVal): bool $predicate
      * @return Option<int>
+     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function position(callable $predicate): Option
     {
@@ -729,5 +731,5 @@ trait IterTrait
      * @return Iterator<TKey, TVal>
      * @internal
      */
-    abstract protected function getIter(): Iterator;
+    abstract public function getIter(): Iterator;
 }

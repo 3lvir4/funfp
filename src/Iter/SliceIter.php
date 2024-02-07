@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\Iter;
 
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 use LimitIterator;
@@ -12,8 +13,10 @@ use LimitIterator;
  * @template TKey
  * @template TVal
  * @extends LimitIterator<TKey, TVal, Iterator<TKey, TVal>>
+ * @implements IterOps<TKey, TVal>
+ * @internal
  */
-class SliceIter extends LimitIterator implements \Countable
+class SliceIter extends LimitIterator implements \Countable, IterOps
 {
     /**
      * @use IterTrait<TKey, TVal>
@@ -33,7 +36,7 @@ class SliceIter extends LimitIterator implements \Countable
     /**
      * @inheritDoc
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

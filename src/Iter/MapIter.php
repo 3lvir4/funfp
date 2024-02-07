@@ -15,6 +15,7 @@ use Iterator;
  * @template UVal
  * @implements Iterator<TKey, UVal>
  * @implements IterOps<TKey, UVal>
+ * @internal
  */
 class MapIter implements Iterator, \Countable, IterOps
 {
@@ -90,7 +91,7 @@ class MapIter implements Iterator, \Countable, IterOps
     /**
      * @inheritDoc
      */
-    #[\Override] protected function getIter(): Iterator
+    #[\Override] public function getIter(): Iterator
     {
         return $this;
     }

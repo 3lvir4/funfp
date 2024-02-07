@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\Iter;
 
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 use MultipleIterator;
 
 /**
  * @extends MultipleIterator<mixed, mixed>
+ * @implements IterOps<array, array>
  * @psalm-suppress InvalidArgument, InvalidReturnType
+ * @internal
  */
-class ZipMultipleIter extends MultipleIterator
+class ZipMultipleIter extends MultipleIterator implements IterOps
 {
     /**
      * @use IterTrait<array, array>
@@ -31,7 +34,7 @@ class ZipMultipleIter extends MultipleIterator
      * @inheritDoc
      * @psalm-return Iterator<array, array>
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

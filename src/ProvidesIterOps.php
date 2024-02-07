@@ -8,10 +8,10 @@ namespace Elvir4\FunFp;
  * @template TKey
  * @template TVal
  */
-interface ProvidesIter
+interface ProvidesIterOps
 {
     /**
-     * @return Iter<TKey, TVal>
+     * @return IterOps<TKey, TVal>
      */
-    public function iter(): Iter;
+    public function iter(): IterOps;
 }

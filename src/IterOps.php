@@ -13,6 +13,8 @@ use Throwable;
  */
 interface IterOps
 {
+    # region Transformers
+
     /**
      * @template UVal
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
@@ -24,7 +26,7 @@ interface IterOps
      * @template UKey
      * @template UVal
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): iterable<UKey, UVal> $f
-     * @return IterOps<UKey, UVal>
+     * @return IterOps<TKey, UVal>
      */
     public function flatMap(callable $f): IterOps;
 
@@ -77,7 +79,7 @@ interface IterOps
     /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): mixed $f
      * @param bool $preserveKeys
-     * @return IterOps<int, array<TKey, TVal>>
+     * @return IterOps<int, array<TVal>>
      */
     public function chunkBy(callable $f, bool $preserveKeys = false): IterOps;
 
@@ -178,6 +180,10 @@ interface IterOps
      */
     public function each(callable $f): IterOps;
 
+    # endregion Transformers
+
+    # region Consumers
+
     /**
      * @template U
      * @param U $initialValue
@@ -218,7 +224,7 @@ interface IterOps
     public function tryCollect(string $dest): Result;
 
     /**
-     * @return array<TVal>
+     * @return TVal[]
      */
     public function toArray(): array;
 
@@ -237,7 +243,7 @@ interface IterOps
 
     /**
      * @param callable(TVal, TVal): int $comparator
-     * @return array<TVal>
+     * @return TVal[]
      */
     public function toSortedArray(callable $comparator): array;
 
@@ -347,4 +353,12 @@ interface IterOps
      * @return Option<TVal>
      */
     public function last(): Option;
+
+    # endregion Consumers
+
+    /**
+     * @return Iterator<TKey, TVal>
+     * @internal
+     */
+    public function getIter(): Iterator;
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\Iter;
 
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 use function Elvir4\FunFp\constructors\iter;
@@ -12,9 +13,11 @@ use function Elvir4\FunFp\constructors\iter;
  * @template TKey
  * @template TVal
  * @implements Iterator<TKey, TVal>
+ * @implements IterOps<TKey, TVal>
  * @psalm-suppress MixedArgument
+ * @internal
  */
-class FlattenIter implements Iterator, \Countable
+class FlattenIter implements Iterator, \Countable, IterOps
 {
     /**
      * @use IterTrait<TKey, TVal>
@@ -103,7 +106,7 @@ class FlattenIter implements Iterator, \Countable
     /**
      * @inheritDoc
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

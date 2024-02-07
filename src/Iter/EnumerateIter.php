@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\Iter;
 
+use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
 use Iterator;
 
@@ -11,9 +12,11 @@ use Iterator;
  * @template TKey
  * @template TVal
  * @implements Iterator<TKey, list{int, TVal}>
+ * @implements IterOps<TKey, list{int, TVal}>
  * @psalm-suppress all
+ * @internal
  */
-class EnumerateIter implements Iterator, \Countable
+class EnumerateIter implements Iterator, \Countable, IterOps
 {
     /**
      * @use IterTrait<TKey, list{int, TVal}>
@@ -72,7 +75,7 @@ class EnumerateIter implements Iterator, \Countable
     /**
      * @inheritDoc
      */
-    protected function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }
