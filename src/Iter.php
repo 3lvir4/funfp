@@ -82,10 +82,7 @@ class Iter implements \Countable, IteratorAggregate, IterOps
                 $iterable = $iterable->getIterator();
             }
             /** @var array|Iterator $iterable */
-            if (is_array($iterable))
-                return new Iter(new ArrayIterator($iterable));
-
-            return new Iter($iterable);
+            return Iter::fromIterable($iterable);
         }
 
         /** @var Iterator $iterable */
