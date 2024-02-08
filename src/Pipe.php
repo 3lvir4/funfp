@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp;
 
+use Elvir4\FunFp\Contracts\ProvidesIterOps;
+
 /**
  * @psalm-suppress MixedAssignment
  * @implements ProvidesIterOps<int, callable>

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\constructors;
 
-use Elvir4\FunFp\Helpers\String\BytesStringIterator;
-use Elvir4\FunFp\Helpers\String\Utf8StringIterator;
+use Elvir4\FunFp\Helpers\String\BytesIterator;
+use Elvir4\FunFp\Helpers\String\Utf8CharsIterator;
+use Elvir4\FunFp\Helpers\String\Utf8LinesIterator;
+use Elvir4\FunFp\Helpers\String\Utf8WordsIterator;
 use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\Iter\GenerateIter;
 use Elvir4\FunFp\Iter\RepeatIter;
@@ -87,7 +89,7 @@ function cycle(iterable $iterable): Result
  */
 function bytes(string $str): IterOps
 {
-    return new Iter(new BytesStringIterator($str));
+    return new Iter(new BytesIterator($str));
 }
 
 /**
@@ -96,7 +98,25 @@ function bytes(string $str): IterOps
  */
 function chars(string $str): IterOps
 {
-    return new Iter(new Utf8StringIterator($str));
+    return new Iter(new Utf8CharsIterator($str));
+}
+
+/**
+ * @param string $str
+ * @return IterOps<int, string>
+ */
+function lines(string $str): IterOps
+{
+    return new Iter(new Utf8LinesIterator($str));
+}
+
+/**
+ * @param string $str
+ * @return IterOps<int, string>
+ */
+function words(string $str): IterOps
+{
+    return new Iter(new Utf8WordsIterator($str));
 }
 
 /**

@@ -11,11 +11,11 @@ use Stringable;
  * @implements Iterator<int, string>
  * @internal
  */
-class Utf8StringIterator implements Iterator, Stringable
+abstract class Utf8StringIterator implements Iterator, Stringable
 {
-    private string $str;
-    private int $ptr = 0;
-    private int $byteCount = 0;
+    protected string $str;
+    protected int $ptr = 0;
+    protected int $byteCount = 0;
     public function __construct(string $str)
     {
         $this->str = $str;
@@ -25,14 +25,7 @@ class Utf8StringIterator implements Iterator, Stringable
     /**
      * @inheritDoc
      */
-    #[\Override] public function current(): string
-    {
-        $this->calcByteCount();
-        if ($this->byteCount === 1)
-            return $this->str[$this->ptr];
-        else
-            return substr($this->str, $this->ptr, $this->byteCount);
-    }
+    abstract public function current(): string;
 
     /**
      * @inheritDoc
@@ -67,9 +60,9 @@ class Utf8StringIterator implements Iterator, Stringable
         $this->calcByteCount();
     }
 
-    private function calcByteCount(): void
+    protected function calcByteCount(): void
     {
-        $b  = ord($this->str[$this->ptr]);
+        $b = ord($this->str[$this->ptr]);
 
         if($b < 128) {
             $this->byteCount = 1;

@@ -1,7 +1,8 @@
 <?php
 
-namespace Elvir4\FunFp;
+namespace Elvir4\FunFp\Contracts;
 
+use Elvir4\FunFp\Result;
 use Iterator;
 use Throwable;
 

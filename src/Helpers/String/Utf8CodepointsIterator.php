@@ -13,7 +13,7 @@ use function ord;
  * @implements Iterator<int, int>
  * @internal
  */
-class Utf8CodepointsStringIterator implements Iterator, Stringable
+class Utf8CodepointsIterator implements Iterator, Stringable
 {
     private string $str;
     private int $ptr = 0;
@@ -27,7 +27,7 @@ class Utf8CodepointsStringIterator implements Iterator, Stringable
     /**
      * @inheritDoc
      */
-    #[\Override] public function current(): mixed
+    #[\Override] public function current(): int
     {
         $this->calcByteCount();
         if ($this->byteCount === 1)

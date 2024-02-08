@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp;
 
+use Elvir4\FunFp\Contracts\FromIterator;
+use Elvir4\FunFp\Contracts\TryFromIterator;
 use Iterator;
 use Throwable;
 
@@ -209,8 +211,8 @@ interface IterOps
     /**
      * @template D of FromIterator
      * @param class-string<D> $dest
-     * @psalm-return D
-     * @psalm-suppress MixedInferredReturnType
+     * @psalm-return FromIterator<D>
+     * @psalm-suppress MixedInferredReturnType, MixedReturnTypeCoercion
      */
     public function collect(string $dest): object;
 

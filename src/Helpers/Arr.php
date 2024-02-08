@@ -1,13 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Elvir4\FunFp\Helpers;
 
 use ArrayIterator;
+use Countable;
+use Elvir4\FunFp\Contracts\FromIterator;
+use Elvir4\FunFp\Contracts\ProvidesIterOps;
+use Elvir4\FunFp\Contracts\TryFromIterator;
 use Elvir4\FunFp\Iter;
 use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\Option;
 use Elvir4\FunFp\Pipe;
-use Elvir4\FunFp\ProvidesIterOps;
+use Elvir4\FunFp\Result;
+use Iterator;
 use IteratorAggregate;
 use Override;
 use Traversable;
@@ -17,10 +24,12 @@ use Traversable;
  * @template TVal
  * @implements IteratorAggregate<TVal>
  * @implements ProvidesIterOps<array-key, TVal>
+ * @implements \Elvir4\FunFp\Contracts\FromIterator<Arr>
+ * @implements \Elvir4\FunFp\Contracts\TryFromIterator<Arr>
  * @psalm-suppress MixedReturnTypeCoercion, MixedArgumentTypeCoercion, ImpureMethodCall, ImpureFunctionCall
  * @psalm-immutable
  */
-class Arr implements IteratorAggregate, ProvidesIterOps
+class Arr implements IteratorAggregate, ProvidesIterOps, Countable, \JsonSerializable, FromIterator, TryFromIterator
 {
     /**
      * @param array<TVal> $array
@@ -80,6 +89,17 @@ class Arr implements IteratorAggregate, ProvidesIterOps
     public function keys(): Arr
     {
         return Arr::of(array_keys($this->array));
+    }
+
+    /**
+     * @template T of FromArr
+     * @param class-string<T> $fqcn
+     * @return T
+     * @psalm-suppress MixedInferredReturnType, MixedReturnStatement
+     */
+    public function into(string $fqcn): mixed
+    {
+        return $fqcn::fromArr($this);
     }
 
     /**
@@ -164,10 +184,50 @@ class Arr implements IteratorAggregate, ProvidesIterOps
     }
 
     /**
+     * @return TVal[]
+     */
+    public function unwrap(): array
+    {
+        return $this->array;
+    }
+
+    /**
      * @inheritDoc
      */
     #[Override] public function getIterator(): Traversable
     {
         return new ArrayIterator($this->array);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override] public function count(): int
+    {
+        return count($this->array);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override] public function jsonSerialize(): mixed
+    {
+        return $this->array;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override] public static function fromIterator(Iterator $iterator): Arr
+    {
+        return Arr::of(iterator_to_array($iterator));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override] public static function tryFromIterator(Iterator $iterator): Result
+    {
+        return Result::try(static fn() => Arr::of(iterator_to_array($iterator)));
     }
 }

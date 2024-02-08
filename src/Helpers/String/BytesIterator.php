@@ -12,7 +12,7 @@ use function ord;
  * @implements Iterator<int, int>
  * @internal
  */
-class BytesStringIterator implements Iterator, Stringable
+class BytesIterator implements Iterator, Stringable
 {
     private string $str;
     private int $ptr = 0;
