@@ -1,6 +1,6 @@
 {
     "name": "3lvir4/funfp",
-    "description": "Some useful FP tools. Not haskell.",
+    "description": "Some useful functional programming tools. Not haskell.",
     "keywords": ["functional", "result", "option", "iterators"],
     "version": "0.0.1",
     "type": "library",
@@ -15,7 +15,7 @@
             "Elvir4\\FunFp\\Tests\\": "tests/"
         },
         "files": [
-          "src/constructors.php"
+          "src/constructors.php", "src/Helpers/functions.php"
         ]
     },
     "authors": [
