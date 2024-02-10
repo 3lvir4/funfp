@@ -86,11 +86,11 @@ interface IterOps
     public function chunkBy(callable $f, bool $preserveKeys = false): IterOps;
 
     /**
-     * @param Iterator<TKey, TVal>|Iter<TKey, TVal> ...$iterators
+     * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> ...$iterators
      * @return IterOps<TKey, TVal>
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function concat(Iterator|Iter ...$iterators): IterOps;
+    public function concat(Iterator|IterOps ...$iterators): IterOps;
 
     /**
      * @template UKey

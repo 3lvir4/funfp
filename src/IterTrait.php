@@ -157,14 +157,14 @@ trait IterTrait
     }
 
     /**
-     * @param Iterator<TKey, TVal>|Iter<TKey, TVal> ...$iterators
+     * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> ...$iterators
      * @return IterOps<TKey, TVal>
      * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function concat(Iterator|Iter ...$iterators): IterOps
+    public function concat(Iterator|IterOps ...$iterators): IterOps
     {
         for ($i = 0; $i < count($iterators); $i++) {
-            if ($iterators[$i] instanceof Iter) {
+            if ($iterators[$i] instanceof IterOps) {
                 $iterators[$i] = $iterators[$i]->getIter();
             }
         }
