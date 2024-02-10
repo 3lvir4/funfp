@@ -13,6 +13,9 @@ use IteratorAggregate;
 use Throwable;
 
 /**
+ * Wrapper around an existing Iterator implementing IterOps thus
+ * allowing chaining iterator operations.
+ *
  * @template TKey
  * @template TVal
  * @implements IteratorAggregate<TKey, TVal>
@@ -43,33 +46,11 @@ class Iter implements \Countable, IteratorAggregate, IterOps
     }
 
     /**
-     * Returns an iterator that yields the result of the given callback infinitely.
-     * @template T
-     * @param callable(): T $f
-     * @return IterOps<int, T>
-     */
-    public static function repeatWith(callable $f): IterOps
-    {
-        return new RepeatIter($f);
-    }
-
-    /**
-     * @template T
-     * @param T $initialValue
-     * @param callable(T): T $genFn
-     * @return IterOps<int, T>
-     */
-    public static function generate($initialValue, callable $genFn): IterOps
-    {
-        return new GenerateIter($initialValue, $genFn);
-    }
-
-    /**
      * @template UKey
      * @template UVal
      * @param iterable<UKey, UVal> $iterable
      * @return IterOps<UKey, UVal>
-     * @throws Exception
+     * @throws Exception on failure.
      * @psalm-suppress InvalidReturnStatement, InvalidReturnType
      */
     public static function fromIterable(iterable $iterable): IterOps
