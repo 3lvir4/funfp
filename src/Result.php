@@ -158,7 +158,7 @@ abstract class Result
      * ```
      *
      * @return T The Ok value.
-     * @throws RuntimeException|Throwable If the result is in the Err state.
+     * @throws RuntimeException If the result is in the Err state.
      */
     abstract public function unwrap(): mixed;
 
