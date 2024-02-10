@@ -8,9 +8,10 @@ use Elvir4\FunFp\Option;
 use Elvir4\FunFp\Result;
 
 /**
- * @template E
- * @extends Result<mixed, E>
+ * @template-covariant E
+ * @extends Result<never, E>
  * @internal
+ * @psalm-suppress InvalidTemplateParam, NoValue
  */
 final class Err extends Result
 {

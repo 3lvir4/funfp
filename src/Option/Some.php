@@ -7,9 +7,10 @@ namespace Elvir4\FunFp\Option;
 use Elvir4\FunFp\Option;
 
 /**
- * @template T
+ * @template-covariant T
  * @extends Option<T>
  * @internal
+ * @psalm-suppress InvalidTemplateParam
  */
 final class Some extends Option
 {

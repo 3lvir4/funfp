@@ -114,7 +114,7 @@ function iter(iterable $iterable): Result
  * @param callable(): T $f
  * @return Traversable<int, T>&IterOps<int, T>
  */
-function repeatWith(callable $f): Traversable&IterOps
+function repeatWith(callable $f): IterOps
 {
     return new RepeatIter($f);
 }
@@ -136,7 +136,7 @@ function repeatWith(callable $f): Traversable&IterOps
  * @param callable(T): T $genFn
  * @return Traversable<int, T>&IterOps<int, T>
  */
-function generate(mixed $initialValue, callable $genFn): Traversable&IterOps
+function generate(mixed $initialValue, callable $genFn): IterOps
 {
     return new GenerateIter($initialValue, $genFn);
 }
@@ -161,14 +161,14 @@ function generate(mixed $initialValue, callable $genFn): Traversable&IterOps
  */
 function cycle(iterable $iterable): Result
 {
-    return iter($iterable)->map(fn($i) => $i->cycle());
+    return \Elvir4\FunFp\constructors\iter($iterable)->map(fn($i) => $i->cycle());
 }
 
 /**
  * @param string $str
  * @return Traversable<int, int>&IterOps<int, int>
  */
-function bytes(string $str): Traversable&IterOps
+function bytes(string $str): IterOps
 {
     return new Iter(new BytesIterator($str));
 }
@@ -177,7 +177,7 @@ function bytes(string $str): Traversable&IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function chars(string $str): Traversable&IterOps
+function chars(string $str): IterOps
 {
     return new Iter(new Utf8CharsIterator($str));
 }
@@ -186,7 +186,7 @@ function chars(string $str): Traversable&IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function lines(string $str): Traversable&IterOps
+function lines(string $str): IterOps
 {
     return new Iter(new Utf8LinesIterator($str));
 }
@@ -195,7 +195,7 @@ function lines(string $str): Traversable&IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function words(string $str): Traversable&IterOps
+function words(string $str): IterOps
 {
     return new Iter(new Utf8WordsIterator($str));
 }
@@ -204,7 +204,7 @@ function words(string $str): Traversable&IterOps
  * @param string $str
  * @return Traversable<int, int>&IterOps<int, int>
  */
-function codepoints(string $str): Traversable&IterOps
+function codepoints(string $str): IterOps
 {
     return new Iter(new Utf8CodepointsIterator($str));
 }
@@ -213,7 +213,7 @@ function codepoints(string $str): Traversable&IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function byteChars(string $str): Traversable&IterOps
+function byteChars(string $str): IterOps
 {
     return new Iter(new AsciiStringIterator($str));
 }

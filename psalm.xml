@@ -3,6 +3,7 @@
     errorLevel="2"
     resolveFromConfigFile="true"
     phpVersion="8.3"
+    findUnusedPsalmSuppress="true"
 >
     <projectFiles>
         <directory name="src" />
@@ -11,4 +12,8 @@
             <directory name="docs" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <UnusedPsalmSuppress errorLevel="info" />
+    </issueHandlers>
 </psalm>

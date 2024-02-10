@@ -16,7 +16,9 @@ use Elvir4\FunFp\Pipe;
 use Elvir4\FunFp\Result;
 use Iterator;
 use IteratorAggregate;
+use JsonSerializable;
 use Override;
+use Throwable;
 use Traversable;
 
 /**
@@ -24,12 +26,12 @@ use Traversable;
  * @template TVal
  * @implements IteratorAggregate<TVal>
  * @implements ProvidesIterOps<array-key, TVal>
- * @implements \Elvir4\FunFp\Contracts\FromIterator<Arr>
- * @implements \Elvir4\FunFp\Contracts\TryFromIterator<Arr>
+ * @implements FromIterator<Arr>
+ * @implements TryFromIterator<Arr>
  * @psalm-suppress MixedReturnTypeCoercion, MixedArgumentTypeCoercion, ImpureMethodCall, ImpureFunctionCall
  * @psalm-immutable
  */
-class Arr implements IteratorAggregate, ProvidesIterOps, Countable, \JsonSerializable, FromIterator, TryFromIterator
+class Arr implements IteratorAggregate, ProvidesIterOps, Countable, JsonSerializable, FromIterator, TryFromIterator
 {
     /**
      * @param array<TVal> $array
@@ -70,7 +72,7 @@ class Arr implements IteratorAggregate, ProvidesIterOps, Countable, \JsonSeriali
     /**
      * @inheritDoc
      */
-    #[Override] public function iter(): IterOps
+    public function iter(): IterOps
     {
         return new Iter(new ArrayIterator($this->array));
     }

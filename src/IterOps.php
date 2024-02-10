@@ -46,13 +46,11 @@ interface IterOps
 
     /**
      * @return IterOps<int, TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function values(): IterOps;
 
     /**
      * @return IterOps<int, TKey>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function keys(): IterOps;
 
@@ -88,7 +86,6 @@ interface IterOps
     /**
      * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> ...$iterators
      * @return IterOps<TKey, TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function concat(Iterator|IterOps ...$iterators): IterOps;
 
@@ -96,19 +93,20 @@ interface IterOps
      * @template UKey
      * @template UVal
      * @param Iterator<UKey, UVal>|IterOps<UKey, UVal> $iterator
-     * @return IterOps<list{TKey, UKey}, list{TVal, UVal}>
-     * @psalm-suppress InvalidReturnType
+     * @return IterOps<array{0: TKey, 1: UKey}, array{0: TVal, 1: UVal}>
+     * @psalm-return IterOps<list{TKey, UKey}, list{TVal, UVal}>
      */
     public function zip(Iterator|IterOps $iterator): IterOps;
 
     /**
      * @param Iterator|IterOps ...$iterators
-     * @return IterOps<array, array>
+     * @return IterOps<array<int, mixed>, array<int, mixed>>
      */
     public function zipMultiple(Iterator|IterOps ...$iterators): IterOps;
 
     /**
-     * @return IterOps<TKey, list{int, TVal}>
+     * @return IterOps<TKey, array{0: int, 1: TVal}>
+     * @psalm-return IterOps<TKey, list{int, TVal}>
      */
     public function enumerate(): IterOps;
 
@@ -127,7 +125,6 @@ interface IterOps
     /**
      * @param int $step
      * @return IterOps<TKey, TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function skipEvery(int $step):  IterOps;
 
@@ -146,7 +143,6 @@ interface IterOps
     /**
      * @param int<0, max> $step
      * @return IterOps<TKey, TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function takeEvery(int $step): IterOps;
 
@@ -160,7 +156,6 @@ interface IterOps
     /**
      * Flattens one level of an iterator of iterators.
      * @return IterOps
-     * @psalm-suppress MixedArgumentTypeCoercion
      */
     public function flatten(): IterOps;
 
@@ -195,10 +190,8 @@ interface IterOps
     public function fold(mixed $initialValue, callable $f): mixed;
 
     /**
-     * @template U
-     * @param callable(U, TVal): U $f
-     * @return Option<U>
-     * @psalm-suppress InvalidReturnType, MixedArgumentTypeCoercion, PossiblyInvalidArgument
+     * @param callable(TVal, TVal): TVal $f
+     * @return Option<TVal>
      */
     public function reduce(callable $f): Option;
 
@@ -209,24 +202,21 @@ interface IterOps
     public function consume(): void;
 
     /**
-     * @template D of FromIterator
-     * @param class-string<D> $dest
-     * @psalm-return D
-     * @psalm-suppress MixedInferredReturnType, MixedReturnTypeCoercion
+     * @template D
+     * @param class-string<FromIterator<D>> $dest
+     * @return FromIterator<D>
      */
     public function collect(string $dest): mixed;
 
     /**
-     * @template D of TryFromIterator
+     * @template D
      * @param class-string<D> $dest
-     * @return Result<object, Throwable>
-     * @psalm-return Result<D, Throwable>
-     * @psalm-suppress MixedInferredReturnType, InvalidReturnType
+     * @return Result<D, Throwable>
      */
     public function tryCollect(string $dest): Result;
 
     /**
-     * @return TVal[]
+     * @return array<TKey, TVal>
      */
     public function toArray(): array;
 
@@ -245,13 +235,12 @@ interface IterOps
 
     /**
      * @param callable(TVal, TVal): int $comparator
-     * @return TVal[]
+     * @return array<TKey, TVal>
      */
     public function toSortedArray(callable $comparator): array;
 
     /**
      * @return array<value-of<TVal>[]>
-     * @psalm-suppress MixedReturnTypeCoercion, MixedAssignment
      */
     public function unzip(): array;
 
@@ -274,21 +263,18 @@ interface IterOps
     /**
      * @param int $n
      * @return Option<TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function nth(int $n): Option;
 
     /**
      * @param ?callable(TVal, TVal): bool $comparator
      * @return Option<TVal>
-     * @psalm-suppress MixedArgumentTypeCoercion
      */
     public function min(?callable $comparator): Option;
 
     /**
      * @param ?callable(TVal, TVal): bool $comparator
      * @return Option<TVal>
-     * @psalm-suppress MixedArgumentTypeCoercion
      */
     public function max(?callable $comparator): Option;
 
@@ -301,7 +287,6 @@ interface IterOps
     /**
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function find(callable $predicate): Option;
 
@@ -314,7 +299,6 @@ interface IterOps
     /**
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function findKey(callable $predicate): Option;
 
@@ -347,7 +331,6 @@ interface IterOps
      * @param bool $preserveKeys
      * @return TVal[]
      * @psalm-return list<TVal>
-     * @psalm-suppress MixedArgumentTypeCoercion, MixedAssignment, MixedArrayOffset, MoreSpecificReturnType, InvalidArrayOffset
      */
     public function takeRandom(int $count = 1, bool $preserveKeys = false): array;
 
@@ -360,7 +343,6 @@ interface IterOps
 
     /**
      * @return Iterator<TKey, TVal>
-     * @internal
      */
     public function getIter(): Iterator;
 }

@@ -7,18 +7,19 @@ namespace Elvir4\FunFp\Option;
 use Elvir4\FunFp\Option;
 
 /**
- * @extends Option<mixed>
+ * @extends Option<never>
  * @internal
+ * @psalm-suppress NoValue
  */
 final class None extends Option
 {
     /**
-     * @var Option|null
+     * @var None|null
      */
-    protected static ?Option $instance = null;
+    protected static ?None $instance = null;
     protected function __construct() {}
 
-    protected static function getInstance(): Option
+    protected static function getInstance(): None
     {
         return self::$instance === null
             ? self::$instance = new None()

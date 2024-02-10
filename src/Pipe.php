@@ -64,7 +64,6 @@ final class Pipe implements ProvidesIterOps
 
     /**
      * @inheritDoc
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     #[\Override] public function iter(): IterOps
     {

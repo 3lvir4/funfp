@@ -39,6 +39,7 @@ use function uasort;
 use function usort;
 
 /**
+ * @uses \Elvir4\FunFp\IterOps
  * @template TKey
  * @template TVal
  * @psalm-require-implements IterOps
@@ -159,7 +160,6 @@ trait IterTrait
     /**
      * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> ...$iterators
      * @return IterOps<TKey, TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function concat(Iterator|IterOps ...$iterators): IterOps
     {
@@ -169,6 +169,7 @@ trait IterTrait
             }
         }
 
+        /** @var Iterator<TKey, TVal>[] $iterators */
         return new ConcatIter($this->getIter(), $iterators);
     }
 
@@ -176,8 +177,8 @@ trait IterTrait
      * @template UKey
      * @template UVal
      * @param Iterator<UKey, UVal>|IterOps<UKey, UVal> $iterator
-     * @return IterOps<list{TKey, UKey}, list{TVal, UVal}>
-     * @psalm-suppress InvalidReturnType, MoreSpecificReturnType
+     * @return IterOps<array{0: TKey, 1: UKey}, array{0: TVal, 1: UVal}>
+     * @psalm-return IterOps<list{TKey, UKey}, list{TVal, UVal}>
      */
     public function zip(Iterator|IterOps $iterator): IterOps
     {
@@ -191,11 +192,11 @@ trait IterTrait
 
     /**
      * @param Iterator|IterOps ...$iterators
-     * @return IterOps<array, array>
+     * @return IterOps<array<int, mixed>, array<int, mixed>>
      */
     public function zipMultiple(Iterator|IterOps ...$iterators): IterOps
     {
-        $g = static fn (Iterator|Iter $iter): Iterator => $iter instanceof IterOps ? $iter->getIter() : $iter;
+        $g = static fn (Iterator|IterOps $iter): Iterator => $iter instanceof IterOps ? $iter->getIter() : $iter;
         return new ZipMultipleIter($this->getIter(), ...array_map($g, $iterators));
     }
 
@@ -332,10 +333,8 @@ trait IterTrait
     }
 
     /**
-     * @template U
-     * @param callable(U, TVal): U $f
-     * @return Option<U>
-     * @psalm-suppress InvalidReturnType, MixedArgumentTypeCoercion, PossiblyInvalidArgument
+     * @param callable(TVal, TVal): TVal $f
+     * @return Option<TVal>
      */
     public function reduce(callable $f): Option
     {
@@ -365,10 +364,9 @@ trait IterTrait
     }
 
     /**
-     * @template D of FromIterator
-     * @param class-string<D> $dest
-     * @psalm-return D
-     * @psalm-suppress MixedInferredReturnType, MixedReturnTypeCoercion
+     * @template D
+     * @param class-string<FromIterator<D>> $dest
+     * @return FromIterator<D>
      */
     public function collect(string $dest): mixed
     {
@@ -376,11 +374,10 @@ trait IterTrait
     }
 
     /**
-     * @template D of TryFromIterator
+     * @template D
      * @param class-string<D> $dest
-     * @return Result<object, Throwable>
-     * @psalm-return Result<D, Throwable>
-     * @psalm-suppress MixedInferredReturnType, InvalidReturnType
+     * @return Result<D, Throwable>
+     * @psalm-suppress MixedInferredReturnType, MixedMethodCall
      */
     public function tryCollect(string $dest): Result
     {
@@ -388,7 +385,7 @@ trait IterTrait
     }
 
     /**
-     * @return array<TVal>
+     * @return array<TKey, TVal>
      */
     public function toArray(): array
     {
@@ -418,11 +415,11 @@ trait IterTrait
 
     /**
      * @param callable(TVal, TVal): int $comparator
-     * @return array<TVal>
+     * @return array<TKey, TVal>
      */
     public function toSortedArray(callable $comparator): array
     {
-        $list = $this->toList();
+        $list = $this->toArray();
         uasort($list, $comparator);
         return $list;
     }
@@ -480,7 +477,6 @@ trait IterTrait
     /**
      * @param int $n
      * @return Option<TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function nth(int $n): Option
     {
@@ -501,7 +497,6 @@ trait IterTrait
     /**
      * @param ?callable(TVal, TVal): bool $comparator
      * @return Option<TVal>
-     * @psalm-suppress MixedArgumentTypeCoercion
      */
     public function min(?callable $comparator): Option
     {
@@ -529,7 +524,6 @@ trait IterTrait
     /**
      * @param ?callable(TVal, TVal): bool $comparator
      * @return Option<TVal>
-     * @psalm-suppress MixedArgumentTypeCoercion
      */
     public function max(?callable $comparator): Option
     {
@@ -572,7 +566,6 @@ trait IterTrait
     /**
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function find(callable $predicate): Option
     {
@@ -603,7 +596,6 @@ trait IterTrait
     /**
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function findKey(callable $predicate): Option
     {
@@ -633,7 +625,6 @@ trait IterTrait
     /**
      * @param callable(TVal): bool $predicate
      * @return Option<int>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function position(callable $predicate): Option
     {
@@ -685,18 +676,18 @@ trait IterTrait
      * @param int $count
      * @param bool $preserveKeys
      * @return TVal[]
-     * @psalm-return list<TVal>
-     * @psalm-suppress MixedArgumentTypeCoercion, MixedAssignment, MixedArrayOffset, MoreSpecificReturnType, InvalidArrayOffset
+     * @psalm-suppress all
      */
     public function takeRandom(int $count = 1, bool $preserveKeys = false): array
     {
+        // TODO: Rework all of it
         if ($count === 0) return [];
         $arr = $this->toArray();
         if (count($arr) === 0) return [];
         if ($count === 1) return [$arr[array_rand($arr)]];
 
         $count = min(count($arr), $count);
-        /** @var array $randKeys */
+        /** @var array<TKey> $randKeys */
         $randKeys = array_rand($arr, $count);
 
         $res = [];
@@ -731,7 +722,6 @@ trait IterTrait
 
     /**
      * @return Iterator<TKey, TVal>
-     * @internal
      */
     abstract public function getIter(): Iterator;
 }

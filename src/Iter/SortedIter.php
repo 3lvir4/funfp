@@ -59,7 +59,6 @@ class SortedIter extends IteratorIterator implements IterOps
 
     /**
      * @inheritDoc
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function toList(): array
     {

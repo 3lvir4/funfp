@@ -19,10 +19,11 @@ use Throwable;
  *
  * It mimics [existing constructs of other languages](https://en.wikipedia.org/wiki/Result_type).
  *
- * @template T The type of the value in the Ok variant.
- * @template E The type of the error value in the Err variant.
+ * @template-covariant T The type of the value in the Ok variant.
+ * @template-covariant E The type of the error value in the Err variant.
  * @psalm-inheritors Ok|Err
  * @psalm-yield T
+ * @psalm-suppress InvalidTemplateParam
  */
 abstract class Result
 {

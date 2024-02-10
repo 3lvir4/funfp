@@ -7,7 +7,7 @@ use Iterator;
 use Throwable;
 
 /**
- * @template Impl of TryFromIterator
+ * @template-covariant Impl
  */
 interface TryFromIterator
 {

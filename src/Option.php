@@ -18,9 +18,10 @@ use RuntimeException;
  *
  * It mimics [existing constructs of other languages](https://en.wikipedia.org/wiki/Option_type).
  *
- * @template T The type of the optional value.
+ * @template-covariant T The type of the optional value.
  * @psalm-inheritors Some|None
  * @psalm-yield T
+ * @psalm-suppress InvalidTemplateParam
  */
 abstract class Option
 {
@@ -53,7 +54,7 @@ abstract class Option
      * // Returns: None
      * ```
      *
-     * @return Option<mixed> None.
+     * @return Option<never> None.
      */
     final public static function None(): Option
     {
@@ -201,7 +202,6 @@ abstract class Option
      * If the Option is Some, this method returns the wrapped value.
      * If the Option is None, it throws.
      *
-     * @psalm-mutation-free
      * @return T The unwrapped value.
      * @throws RuntimeException When variant is None.
      */
@@ -211,9 +211,9 @@ abstract class Option
      * Get the value out of the Option if `Some` variant.
      * Returns the provided default value otherwise.
      *
-     * @psalm-mutation-free
-     * @param T $default The default value to return if the option is None.
-     * @return T
+     * @template U
+     * @param U $default The default value to return if the option is None.
+     * @return T|U
      */
     abstract public function unwrapOr(mixed $default): mixed;
 

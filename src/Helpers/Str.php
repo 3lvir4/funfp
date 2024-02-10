@@ -67,7 +67,6 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
     /**
      * @param iterable<string> $iter
      * @return Str
-     * @psalm-suppress InvalidArgument
      */
     public static function fromIterable(iterable $iter): Str
     {
@@ -313,7 +312,6 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
     /**
      * @param int $index
      * @return Option<string>
-     * @psalm-suppress MixedReturnTypeCoercion
      */
     public function charAt(int $index): Option
     {

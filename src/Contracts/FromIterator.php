@@ -7,7 +7,7 @@ namespace Elvir4\FunFp\Contracts;
 use Iterator;
 
 /**
- * @template Impl
+ * @template-covariant Impl
  */
 interface FromIterator
 {
