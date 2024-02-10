@@ -175,27 +175,27 @@ trait IterTrait
     /**
      * @template UKey
      * @template UVal
-     * @param Iterator<UKey, UVal>|Iter<UKey, UVal> $iterator
+     * @param Iterator<UKey, UVal>|IterOps<UKey, UVal> $iterator
      * @return IterOps<list{TKey, UKey}, list{TVal, UVal}>
      * @psalm-suppress InvalidReturnType, MoreSpecificReturnType
      */
-    public function zip(Iterator|Iter $iterator): IterOps
+    public function zip(Iterator|IterOps $iterator): IterOps
     {
         return new ZipIter(
             $this->getIter(),
-            $iterator instanceof Iter
+            $iterator instanceof IterOps
                 ? $iterator->getIter()
                 : $iterator
         );
     }
 
     /**
-     * @param Iterator|Iter ...$iterators
+     * @param Iterator|IterOps ...$iterators
      * @return IterOps<array, array>
      */
-    public function zipMultiple(Iterator|Iter ...$iterators): IterOps
+    public function zipMultiple(Iterator|IterOps ...$iterators): IterOps
     {
-        $g = static fn (Iterator|Iter $iter): Iterator => $iter instanceof Iter ? $iter->getIter() : $iter;
+        $g = static fn (Iterator|Iter $iter): Iterator => $iter instanceof IterOps ? $iter->getIter() : $iter;
         return new ZipMultipleIter($this->getIter(), ...array_map($g, $iterators));
     }
 
@@ -367,10 +367,10 @@ trait IterTrait
     /**
      * @template D of FromIterator
      * @param class-string<D> $dest
-     * @psalm-return FromIterator<D>
+     * @psalm-return D
      * @psalm-suppress MixedInferredReturnType, MixedReturnTypeCoercion
      */
-    public function collect(string $dest): object
+    public function collect(string $dest): mixed
     {
         return $dest::fromIterator($this->getIter());
     }

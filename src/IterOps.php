@@ -95,17 +95,17 @@ interface IterOps
     /**
      * @template UKey
      * @template UVal
-     * @param Iterator<UKey, UVal>|Iter<UKey, UVal> $iterator
+     * @param Iterator<UKey, UVal>|IterOps<UKey, UVal> $iterator
      * @return IterOps<list{TKey, UKey}, list{TVal, UVal}>
      * @psalm-suppress InvalidReturnType
      */
-    public function zip(Iterator|Iter $iterator): IterOps;
+    public function zip(Iterator|IterOps $iterator): IterOps;
 
     /**
-     * @param Iterator|Iter ...$iterators
+     * @param Iterator|IterOps ...$iterators
      * @return IterOps<array, array>
      */
-    public function zipMultiple(Iterator|Iter ...$iterators): IterOps;
+    public function zipMultiple(Iterator|IterOps ...$iterators): IterOps;
 
     /**
      * @return IterOps<TKey, list{int, TVal}>
@@ -211,10 +211,10 @@ interface IterOps
     /**
      * @template D of FromIterator
      * @param class-string<D> $dest
-     * @psalm-return FromIterator<D>
+     * @psalm-return D
      * @psalm-suppress MixedInferredReturnType, MixedReturnTypeCoercion
      */
-    public function collect(string $dest): object;
+    public function collect(string $dest): mixed;
 
     /**
      * @template D of TryFromIterator
