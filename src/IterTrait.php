@@ -365,7 +365,7 @@ trait IterTrait
 
     /**
      * @template D
-     * @param class-string<FromIterator<D>> $dest
+     * @param class-string<D> $dest
      * @return FromIterator<D>
      */
     public function collect(string $dest): mixed
@@ -385,7 +385,7 @@ trait IterTrait
     }
 
     /**
-     * @return array<TKey, TVal>
+     * @return array<TVal>
      */
     public function toArray(): array
     {
@@ -415,7 +415,7 @@ trait IterTrait
 
     /**
      * @param callable(TVal, TVal): int $comparator
-     * @return array<TKey, TVal>
+     * @return array<TVal>
      */
     public function toSortedArray(callable $comparator): array
     {

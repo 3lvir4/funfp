@@ -204,7 +204,7 @@ interface IterOps
 
     /**
      * @template D
-     * @param class-string<FromIterator<D>> $dest
+     * @param class-string<D> $dest
      * @return FromIterator<D>
      */
     public function collect(string $dest): mixed;
@@ -217,7 +217,7 @@ interface IterOps
     public function tryCollect(string $dest): Result;
 
     /**
-     * @return array<TKey, TVal>
+     * @return array<TVal>
      */
     public function toArray(): array;
 
@@ -236,7 +236,7 @@ interface IterOps
 
     /**
      * @param callable(TVal, TVal): int $comparator
-     * @return array<TKey, TVal>
+     * @return array<TVal>
      */
     public function toSortedArray(callable $comparator): array;
 
