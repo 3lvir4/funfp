@@ -3,7 +3,7 @@
 namespace Elvir4\FunFp\Tests;
 
 use Elvir4\FunFp\Helpers\Arr;
-use Elvir4\FunFp\Iter\RewindbableIter;
+use Elvir4\FunFp\Iter\RewindableIter;
 use Elvir4\FunFp\Option;
 use PHPUnit\Framework\TestCase;
 use function Elvir4\FunFp\constructors\generate;
@@ -289,7 +289,7 @@ class IterTest extends TestCase
 
     public function test_rewindable_iter(): void
     {
-        $i = new RewindbableIter((function () {
+        $i = new RewindableIter((function () {
             for ($i = 0; $i < 10; $i++) {
                 yield $i;
             }

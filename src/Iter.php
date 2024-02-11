@@ -7,7 +7,7 @@ namespace Elvir4\FunFp;
 use ArrayIterator;
 use Elvir4\FunFp\Iter\GenerateIter;
 use Elvir4\FunFp\Iter\RepeatIter;
-use Elvir4\FunFp\Iter\RewindbableIter;
+use Elvir4\FunFp\Iter\RewindableIter;
 use Exception;
 use Generator;
 use Iterator;
@@ -69,7 +69,7 @@ class Iter implements \Countable, IteratorAggregate, IterOps
         }
 
         if ($iterable instanceof Generator)
-            return new RewindbableIter($iterable);
+            return new RewindableIter($iterable);
 
         /** @var Iterator $iterable */
         return new Iter($iterable);

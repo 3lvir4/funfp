@@ -19,7 +19,7 @@ use Iterator;
  * @implements IterOps<TKey, TVal>
  * @internal
  */
-class RewindbableIter implements Iterator, IterOps
+class RewindableIter implements Iterator, IterOps
 {
     /**
      * @use IterTrait<TKey, TVal>
