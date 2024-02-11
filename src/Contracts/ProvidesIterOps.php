@@ -8,7 +8,7 @@ use Elvir4\FunFp\IterOps;
 
 /**
  * @template TKey
- * @template TVal
+ * @template-covariant TVal
  */
 interface ProvidesIterOps
 {
