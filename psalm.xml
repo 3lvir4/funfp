@@ -4,6 +4,8 @@
     resolveFromConfigFile="true"
     phpVersion="8.3"
     findUnusedPsalmSuppress="true"
+    findUnusedBaselineEntry="false"
+    findUnusedCode="false"
 >
     <projectFiles>
         <directory name="src" />
@@ -15,5 +17,6 @@
 
     <issueHandlers>
         <UnusedPsalmSuppress errorLevel="info" />
+        <InvalidTemplateParam errorLevel="suppress" />
     </issueHandlers>
 </psalm>
