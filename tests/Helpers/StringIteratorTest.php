@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elvir4\FunFp\Tests\Helpers;
 
 use Elvir4\FunFp\Helpers\String\AsciiStringIterator;
+use Elvir4\FunFp\Helpers\String\BytesIterator;
 use Elvir4\FunFp\Helpers\String\Utf8CharsIterator;
 use Elvir4\FunFp\Helpers\String\Utf8LinesIterator;
 use Elvir4\FunFp\Helpers\String\Utf8WordsIterator;
@@ -13,10 +14,17 @@ use function Elvir4\FunFp\constructors\iter;
 
 class StringIteratorTest extends TestCase
 {
-    public function test_bytes_iter(): void
+    public function test_ascii_iter(): void
     {
         $i = iter(new AsciiStringIterator("abcdefgh"))->unwrap();
         $this->assertEquals(["a", "b", "c", "d", "e", "f", "g", "h"], $i->toList());
+    }
+
+    public function test_bytes_iter(): void
+    {
+        $i = iter(new BytesIterator("hello world!"))->unwrap();
+        $this->assertEquals([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33] ,$i->toList());
+        $this->assertEquals([], iter(new BytesIterator(""))->unwrap()->toList());
     }
 
     public function test_utf8_iter(): void
