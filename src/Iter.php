@@ -7,7 +7,9 @@ namespace Elvir4\FunFp;
 use ArrayIterator;
 use Elvir4\FunFp\Iter\GenerateIter;
 use Elvir4\FunFp\Iter\RepeatIter;
+use Elvir4\FunFp\Iter\RewindbableIter;
 use Exception;
+use Generator;
 use Iterator;
 use IteratorAggregate;
 use Throwable;
@@ -17,7 +19,7 @@ use Throwable;
  * allowing chaining iterator operations.
  *
  * @template TKey
- * @template TVal
+ * @template-covariant TVal
  * @implements IteratorAggregate<TKey, TVal>
  * @implements IterOps<TKey, TVal>
  */
@@ -65,6 +67,9 @@ class Iter implements \Countable, IteratorAggregate, IterOps
             /** @var array|Iterator $iterable */
             return Iter::fromIterable($iterable);
         }
+
+        if ($iterable instanceof Generator)
+            return new RewindbableIter($iterable);
 
         /** @var Iterator $iterable */
         return new Iter($iterable);

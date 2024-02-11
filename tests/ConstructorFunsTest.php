@@ -15,6 +15,7 @@ use function Elvir4\FunFp\constructors\iter;
 use function Elvir4\FunFp\constructors\None;
 use function Elvir4\FunFp\constructors\Ok;
 use function Elvir4\FunFp\constructors\Some;
+use function Elvir4\FunFp\constructors\zipKeyValues;
 
 class ConstructorFunsTest extends TestCase
 {
@@ -34,6 +35,16 @@ class ConstructorFunsTest extends TestCase
             ->then(fn($n) => $n % 2 === 0);
 
         $this->assertFalse($piped(7, 3, 9, 15));
+    }
+
+    public function test_zip_key_values(): void
+    {
+        $i = zipKeyValues([0, 10, 20], ["foo", "bar", "baz"])->unwrap();
+        $this->assertEquals([
+            0 => "foo",
+            10 => "bar",
+            20 => "baz"
+        ], $i->toArray());
     }
 
     public function test_iter(): void

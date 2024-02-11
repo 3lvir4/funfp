@@ -2,6 +2,8 @@
 
 namespace Elvir4\FunFp\Tests;
 
+use Elvir4\FunFp\Helpers\Arr;
+use Elvir4\FunFp\Iter\RewindbableIter;
 use Elvir4\FunFp\Option;
 use PHPUnit\Framework\TestCase;
 use function Elvir4\FunFp\constructors\generate;
@@ -28,6 +30,8 @@ class IterTest extends TestCase
         $arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
         $iter = iter($arr)->unwrap()->filter(fn($n) => $n % 2 === 0);
+
+        var_dump($iter);
 
         $this->assertEquals(Option::Some(8), $iter->nth(4));
         $this->assertEquals(Option::None(), $iter->nth(6));
@@ -281,5 +285,24 @@ class IterTest extends TestCase
             ],
             $i1->zipMultiple($i2, $i3)->take(4)->toList()
         );
+    }
+
+    public function test_rewindable_iter(): void
+    {
+        $i = new RewindbableIter((function () {
+            for ($i = 0; $i < 10; $i++) {
+                yield $i;
+            }
+        })());
+
+        $l = $i->toList();
+        $this->assertEquals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], $l);
+
+        $l = $i->toList();
+        $this->assertEquals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], $l);
+
+        $i->rewind();
+        $a = $i->current();
+        $this->assertEquals(0, $a);
     }
 }

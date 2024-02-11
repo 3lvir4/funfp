@@ -40,8 +40,8 @@ use function usort;
 
 /**
  * @uses \Elvir4\FunFp\IterOps
- * @template TKey
- * @template TVal
+ * @template-covariant TKey
+ * @template-covariant TVal
  * @psalm-require-implements IterOps
  */
 trait IterTrait
@@ -701,6 +701,18 @@ trait IterTrait
             }
         }
         return $res;
+    }
+
+    /**
+     * @return Option<TVal>
+     */
+    public function first(): Option
+    {
+        $i = $this->getIter();
+        $i->rewind();
+        return $i->valid()
+            ? Option::Some($i->current())
+            : Option::None();
     }
 
     /**

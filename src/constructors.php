@@ -10,6 +10,7 @@ use Elvir4\FunFp\Helpers\String\Utf8CharsIterator;
 use Elvir4\FunFp\Helpers\String\Utf8CodepointsIterator;
 use Elvir4\FunFp\Helpers\String\Utf8LinesIterator;
 use Elvir4\FunFp\Helpers\String\Utf8WordsIterator;
+use Elvir4\FunFp\Iter\ZipKeyValuesIter;
 use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\Iter\GenerateIter;
 use Elvir4\FunFp\Iter\RepeatIter;
@@ -51,7 +52,7 @@ use Traversable;
  * ```
  *
  * @param callable ...$functions The callables to be chained.
- * @return Pipe A Pipe object representing the chained functions.
+ * @return Pipe A {@see Pipe} object representing the chained functions.
  */
 function pipe(callable ...$functions): Pipe
 {
@@ -161,10 +162,40 @@ function generate(mixed $initialValue, callable $genFn): IterOps
  */
 function cycle(iterable $iterable): Result
 {
-    return \Elvir4\FunFp\constructors\iter($iterable)->map(fn($i) => $i->cycle());
+    return iter($iterable)->map(fn($i) => $i->cycle());
 }
 
 /**
+ * Creates an IterOps implementation that uses the values of the first provided iterable
+ * as keys for the second.
+ *
+ * Example:
+ * ```
+ * $iterator = zipKeyValues([0, 10, 20], ["foo", "bar", "baz"])->unwrap();
+ * foreach ($iterator as $key => $value) {
+ *     echo $key . ">>" . $value . PHP_EOL; // Output: 0>>foo, 10>>bar, 20>>baz
+ * }
+ * ```
+ *
+ * @template TKey
+ * @template TVal
+ * @param iterable<TKey> $keys
+ * @param iterable<TVal> $values
+ * @return Result<IterOps<TKey, TVal>, Throwable>
+ */
+function zipKeyValues(iterable $keys, iterable $values): Result
+{
+    return Result::try(
+        static fn() => new ZipKeyValuesIter(
+            Iter::fromIterable($keys)->getIter(),
+            Iter::fromIterable($values)->getIter()
+        )
+    );
+}
+
+/**
+ * Returns an IterOps implementation over the bytes of a string.
+ *
  * @param string $str
  * @return Traversable<int, int>&IterOps<int, int>
  */
@@ -174,6 +205,9 @@ function bytes(string $str): IterOps
 }
 
 /**
+ * Returns an IterOps implementation over the chars of a string.
+ * Supports UTF-8 compatible strings.
+ *
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
@@ -183,6 +217,9 @@ function chars(string $str): IterOps
 }
 
 /**
+ * Returns an IterOps implementation over the lines of a string.
+ * Supports UTF-8 compatible strings.
+ *
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
@@ -192,6 +229,9 @@ function lines(string $str): IterOps
 }
 
 /**
+ * Returns an IterOps implementation over the words of a string.
+ * Supports UTF-8 compatible strings.
+ *
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
@@ -201,6 +241,8 @@ function words(string $str): IterOps
 }
 
 /**
+ * Returns an IterOps implementation over the UTF-8 codepoints of a string.
+ *
  * @param string $str
  * @return Traversable<int, int>&IterOps<int, int>
  */
@@ -210,6 +252,8 @@ function codepoints(string $str): IterOps
 }
 
 /**
+ * Same as {@see chars()} but treating the string as ASCII.
+ *
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */

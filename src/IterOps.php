@@ -10,8 +10,9 @@ use Iterator;
 use Throwable;
 
 /**
- * @template TKey
- * @template TVal
+ * @template-covariant TKey
+ * @template-covariant TVal
+ * @psalm-suppress InvalidTemplateParam
  */
 interface IterOps
 {
@@ -333,6 +334,11 @@ interface IterOps
      * @psalm-return list<TVal>
      */
     public function takeRandom(int $count = 1, bool $preserveKeys = false): array;
+
+    /**
+     * @return Option<TVal>
+     */
+    public function first(): Option;
 
     /**
      * @return Option<TVal>
