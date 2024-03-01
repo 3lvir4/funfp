@@ -6,6 +6,7 @@ namespace Elvir4\FunFp\Iter;
 
 use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
+use Elvir4\FunFp\Pair;
 use Iterator;
 
 /**
@@ -32,8 +33,7 @@ class RewindableIter implements Iterator, IterOps
     private Iterator $iterator;
 
     /**
-     * @var array<array{0: TKey, 1: TVal}>
-     * @psalm-var array<list{TKey, TVal}>
+     * @var array<null|Pair<TKey, TVal>>
      */
     private array $cache;
     private int $index = 0;
@@ -49,10 +49,10 @@ class RewindableIter implements Iterator, IterOps
      */
     #[\Override] public function current(): mixed
     {
-        if (isset($this->cache[$this->index][1]))
+        if (isset($this->cache[$this->index]))
             return $this->cache[$this->index][1];
         $val = $this->iterator->current();
-        $this->cache[$this->index][1] = $val;
+        $this->cache[$this->index] = new Pair($this->iterator->key(), $val);
         return $val;
     }
 
@@ -65,7 +65,7 @@ class RewindableIter implements Iterator, IterOps
         if (!isset($this->cache[$this->index])) {
             $this->iterator->next();
             if ($this->iterator->valid()) {
-                $this->cache[$this->index] = [];
+                $this->cache[$this->index] = NULL;
             }
         }
     }
@@ -75,11 +75,9 @@ class RewindableIter implements Iterator, IterOps
      */
     #[\Override] public function key(): mixed
     {
-        if (isset($this->cache[$this->index][0]))
-            return$this->cache[$this->index][1];
-        $key = $this->iterator->key();
-        $this->cache[$this->index][0] = $key;
-        return $key;
+        if (isset($this->cache[$this->index]))
+            return$this->cache[$this->index][0];
+        return $this->iterator->key();
     }
 
     /**
