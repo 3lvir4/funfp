@@ -62,7 +62,7 @@ abstract class Utf8StringIterator implements Iterator, Stringable
 
     protected function calcByteCount(): void
     {
-        $b = ord($this->str[$this->ptr]);
+        $b = @ord($this->str[$this->ptr]);
 
         if($b < 128) {
             $this->byteCount = 1;
