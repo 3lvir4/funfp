@@ -2,7 +2,7 @@
     "name": "3lvir4/funfp",
     "description": "Some useful functional programming tools. Not haskell.",
     "keywords": ["functional", "result", "option", "iterators"],
-    "version": "0.0.1",
+    "version": "0.0.2",
     "type": "library",
     "license": "MIT",
     "autoload": {
