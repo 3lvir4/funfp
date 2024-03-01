@@ -149,6 +149,22 @@ class Arr implements IteratorAggregate, ProvidesIterOps, Countable, JsonSerializ
     }
 
     /**
+     * @param int $offset
+     * @param int|null $length
+     * @param bool $preserveKeys
+     * @return Arr<TVal>
+     */
+    public function slice(int $offset, ?int $length = null, bool $preserveKeys = false): Arr
+    {
+        return Arr::of(array_slice($this->array, $offset, $length, $preserveKeys));
+    }
+
+    public function reverse(bool $preserve_keys = false): Arr
+    {
+        return Arr::of(array_reverse($this->array, $preserve_keys));
+    }
+
+    /**
      * @param array-key $key
      * @return Option<TVal>
      */

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp\Helpers;
 
+use Closure;
 use Countable;
 use Elvir4\FunFp\Option;
+use Elvir4\FunFp\Pipe;
 use Stringable;
+use function Elvir4\FunFp\constructors\pipe;
 
 /**
  * @template T
@@ -109,5 +112,75 @@ function pos(iterable $haystack, mixed $needle): Option
         $i++;
     }
     return Option::None();
+}
+
+/**
+ * @param string $operator
+ * @param mixed|null $rightArg
+ * @return Closure
+ * @psalm-suppress MissingClosureReturnType, MissingClosureParamType, MixedOperand
+ */
+function op(string $operator = "", mixed $rightArg = null): Closure
+{
+    $ops = [
+        "+" => fn($a, $b) => $a + $b,
+        "-" => fn($a, $b) => $a - $b,
+        "*" => fn($a, $b) => $a * $b,
+        "." => fn($a, $b) => $a . $b,
+        "/" => fn($a, $b) => $a / $b,
+        "%" => fn($a, $b) => $a % $b,
+        "**" => fn($a, $b) => $a ** $b,
+        "<<" => fn($a, $b) => $a << $b,
+        ">>" => fn($a, $b) => $a >> $b,
+        "|" => fn($a, $b) => $a | $b,
+        "&" => fn($a, $b) => $a & $b,
+        "^" => fn($a, $b) => $a ^ $b,
+        "<=>" => fn($a, $b) => $a <=> $b,
+        "~" => fn($a) => ~$a,
+        "!" => fn($a) => !$a,
+        "||" => fn($a, $b) => $a || $b,
+        "&&" => fn($a, $b) => $a && $b,
+        "==" => fn($a, $b) => $a == $b,
+        "===" => fn($a, $b) => $a === $b,
+        "!=" => fn($a, $b) => $a != $b,
+        "!==" => fn($a, $b) => $a !== $b,
+        "<" => fn($a, $b) => $a < $b,
+        ">" => fn($a, $b) => $a > $b,
+        "<=" => fn($a, $b) => $a <= $b,
+        ">=" => fn($a, $b) => $a >= $b,
+        "and" => fn($a, $b) => $a and $b,
+        "or" => fn($a, $b) => $a or $b,
+        "xor" => fn($a, $b) => $a xor $b,
+        "instanceof" => fn($a, $b) => $a instanceof $b,
+        "??" => fn($a, $b) => $a ?? $b,
+        "|>" => fn(callable $a, callable $b) => pipe($a, $b)
+    ];
+
+    if (!isset($ops[$operator]))
+        throw new \InvalidArgumentException("Provided operator `$operator` unknown.");
+
+    $op = $ops[$operator];
+    return is_null($rightArg)
+        ? $op
+        : fn($a) => $op($a, $rightArg);
+}
+
+/**
+ * @template U
+ * @template K
+ * @template V
+ *
+ * @param iterable<K, V> $iterable
+ * @param U $initialValue
+ * @param callable(U, V, K): U $fun
+ * @return U
+ */
+function fold(iterable $iterable, mixed $initialValue, callable $fun): mixed
+{
+    $acc = $initialValue;
+    foreach ($iterable as $k => $v) {
+        $acc = $fun($acc, $v, $k);
+    }
+    return $acc;
 }
 

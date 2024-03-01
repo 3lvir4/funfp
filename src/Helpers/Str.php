@@ -20,14 +20,16 @@ use Elvir4\FunFp\Result;
 use Iterator;
 use IteratorAggregate;
 use JsonSerializable;
+use Override;
 use Stringable;
 use Traversable;
 
 /**
  * Immutable UTF-8 string wrapper.
+ *
  * @psalm-immutable
  * @implements IteratorAggregate<int, string>
- * @implements \Elvir4\FunFp\Contracts\TryFromIterator<Str>
+ * @implements TryFromIterator<Str>
  * @implements FromIterator<Str>
  * @implements FromArr<Str>
  * @psalm-suppress ImpureMethodCall, MixedArgumentTypeCoercion, ImpureFunctionCall
@@ -161,39 +163,11 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
 
     /**
      * @return bool
-     * @psalm-assert-if-true numeric-string $this->str
-     */
-    public function isNumeric(): bool
-    {
-        return is_numeric($this->str);
-    }
-
-    /**
-     * @return bool
-     * @psalm-assert-if-true numeric-string $this->str
-     */
-    public function isInt(): bool
-    {
-        return ctype_digit($this->str);
-    }
-
-    /**
-     * @return bool
      * @psalm-assert-if-true non-empty-string $this->str
      */
     public function isEmpty(): bool
     {
         return $this->str === "";
-    }
-
-    public function toInt(): int
-    {
-        return intval($this->str);
-    }
-
-    public function toFloat(): float
-    {
-        return floatval($this->str);
     }
 
     /**
@@ -332,12 +306,12 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
     /**
      * @inheritDoc
      */
-    #[\Override] public function getIterator(): Traversable
+    #[Override] public function getIterator(): Traversable
     {
         return $this->chars();
     }
 
-    #[\Override] public static function fromIterator(Iterator $iterator): self
+    #[Override] public static function fromIterator(Iterator $iterator): self
     {
         return Str::of(
             implode("", iterator_to_array($iterator, false))
@@ -347,7 +321,7 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
     /**
      * @inheritDoc
      */
-    #[\Override] public static function tryFromIterator(Iterator $iterator): Result
+    #[Override] public static function tryFromIterator(Iterator $iterator): Result
     {
         return Result::try(
             static fn() => Str::of(
@@ -359,7 +333,7 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
     /**
      * @inheritDoc
      */
-    #[\Override] public function count(): int
+    #[Override] public function count(): int
     {
         return $this->length();
     }
@@ -367,7 +341,7 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
     /**
      * @inheritDoc
      */
-    #[\Override] public function jsonSerialize(): string
+    #[Override] public function jsonSerialize(): string
     {
         return $this->str;
     }
@@ -375,7 +349,7 @@ class Str implements Stringable, IteratorAggregate, FromIterator, TryFromIterato
     /**
      * @inheritDoc
      */
-    #[\Override] public static function fromArr(Arr $arr): Str
+    #[Override] public static function fromArr(Arr $arr): Str
     {
         return Str::of(join($arr->unwrap()));
     }
