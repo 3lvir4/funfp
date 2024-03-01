@@ -6,36 +6,35 @@ namespace Elvir4\FunFp\Iter;
 
 use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
+use Elvir4\FunFp\Pair;
 use Iterator;
 
 /**
  * @template TKey
  * @template TVal
- * @implements Iterator<TKey, list{int, TVal}>
- * @implements IterOps<TKey, list{int, TVal}>
+ * @implements Iterator<TKey, Pair<int, TVal>>
+ * @implements IterOps<TKey, Pair<int, TVal>>
  * @psalm-suppress all
  * @internal
  */
 class EnumerateIter implements Iterator, \Countable, IterOps
 {
     /**
-     * @use IterTrait<TKey, list{int, TVal}>
+     * @use IterTrait<TKey, Pair<int, TVal>>
      */
     use IterTrait;
-
-    private int $index = 0;
 
     /**
      * @param Iterator<TKey, TVal> $iterator
      */
-    public function __construct(private readonly Iterator $iterator) {}
+    public function __construct(private readonly Iterator $iterator, private int $index = 0) {}
 
     /**
      * @inheritDoc
      */
-    #[\Override] public function current(): array
+    #[\Override] public function current(): Pair
     {
-        return [$this->index, $this->iterator->current()];
+        return new Pair($this->index, $this->iterator->current());
     }
 
     /**

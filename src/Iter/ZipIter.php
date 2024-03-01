@@ -6,6 +6,7 @@ namespace Elvir4\FunFp\Iter;
 
 use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
+use Elvir4\FunFp\Pair;
 use Iterator;
 
 /**
@@ -13,15 +14,15 @@ use Iterator;
  * @template TVal
  * @template UKey
  * @template UVal
- * @implements Iterator<list{TKey, UKey}, list{TVal, UVal}>
- * @implements IterOps<list{TKey, UKey}, list{TVal, UVal}>
+ * @implements Iterator<Pair<TKey, UKey>, Pair<TVal, UVal>>
+ * @implements IterOps<Pair<TKey, UKey>, Pair<TVal, UVal>>
  * @psalm-suppress all
  * @internal
  */
 class ZipIter implements Iterator, \Countable, IterOps
 {
     /**
-     * @use IterTrait<list{TKey, UKey}, list{TVal, UVal}>
+     * @use IterTrait<Pair<TKey, UKey>, Pair<TVal, UVal>>
      */
     use IterTrait;
 
@@ -49,9 +50,9 @@ class ZipIter implements Iterator, \Countable, IterOps
     /**
      * @inheritDoc
      */
-    #[\Override] public function current(): array
+    #[\Override] public function current(): Pair
     {
-        return [$this->first->current(), $this->second->current()];
+        return new Pair($this->first->current(), $this->second->current());
     }
 
     /**
