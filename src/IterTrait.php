@@ -8,7 +8,7 @@ use ArrayAccess;
 use Elvir4\FunFp\Contracts\FromIterator;
 use Elvir4\FunFp\Contracts\TryFromIterator;
 use Elvir4\FunFp\Iter\ChunkByIter;
-use Elvir4\FunFp\Iter\ChunkEvery;
+use Elvir4\FunFp\Iter\ChunkEveryIter;
 use Elvir4\FunFp\Iter\ConcatIter;
 use Elvir4\FunFp\Iter\CycleIter;
 use Elvir4\FunFp\Iter\DedupByIter;
@@ -217,7 +217,7 @@ trait IterTrait
         iterable $leftover = [],
         bool $preserveKeys = false
     ): IterOps {
-        return new ChunkEvery($this->getIter(), $count, $step ?? $count, $discard, $leftover, $preserveKeys);
+        return new ChunkEveryIter($this->getIter(), $count, $step ?? $count, $discard, $leftover, $preserveKeys);
     }
 
     /**
