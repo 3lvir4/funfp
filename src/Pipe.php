@@ -6,6 +6,7 @@ namespace Elvir4\FunFp;
 
 use Elvir4\FunFp\Contracts\ProvidesIterOps;
 use function Elvir4\FunFp\constructors\pipe;
+use function Elvir4\FunFp\Helpers\tap;
 
 /**
  * Represents a chain of operations.
@@ -44,6 +45,21 @@ final class Pipe implements ProvidesIterOps
     {
         $this->fns[] = $f;
         return $this;
+    }
+
+    /**
+     * Executes the provided callable with the previous returned value
+     * in the pipeline and returns the value unchanged. Can be use-full for
+     * performing side effects without changing the value at hand.
+     *
+     * @see tap()
+     * @param callable(mixed): void $f
+     * @return $this
+     * @psalm-suppress MissingClosureReturnType
+     */
+    public function tap(callable $f): self
+    {
+        return $this->then(function (mixed $v) use ($f) { $f($v); return $v; });
     }
 
     /**
