@@ -3,9 +3,11 @@
 namespace Elvir4\FunFp\Tests;
 
 use Elvir4\FunFp\Helpers\Arr;
+use Elvir4\FunFp\Iter\DedupWithCountIter;
 use Elvir4\FunFp\Iter\RewindableIter;
 use Elvir4\FunFp\Option;
 use PHPUnit\Framework\TestCase;
+use function Elvir4\FunFp\constructors\cycle;
 use function Elvir4\FunFp\constructors\generate;
 use function Elvir4\FunFp\constructors\iter;
 
@@ -30,8 +32,6 @@ class IterTest extends TestCase
         $arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
         $iter = iter($arr)->unwrap()->filter(fn($n) => $n % 2 === 0);
-
-        var_dump($iter);
 
         $this->assertEquals(Option::Some(8), $iter->nth(4));
         $this->assertEquals(Option::None(), $iter->nth(6));
@@ -76,6 +76,21 @@ class IterTest extends TestCase
         $this->assertEquals([2, 3, 4], $i->slice(1, 3)->toList());
     }
 
+    public function test_map_every(): void
+    {
+        $nums = generate(1, fn($n) => $n + 1);
+        $squareNum = fn($n) => $n * 2;
+        $this->assertEquals(
+            [2, 2, 6, 4, 10, 6, 14, 8, 18, 10],
+            $nums->mapEvery(2, $squareNum)->take(10)->toList()
+        );
+        $this->assertEquals(
+            $nums->map($squareNum)->take(8)->toList(),
+            $nums->mapEvery(1, $squareNum)->take(8)->toList()
+        );
+        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], $nums->mapEvery(0, $squareNum)->take(7)->toList());
+    }
+
     public function test_take_every(): void
     {
         $arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -118,6 +133,56 @@ class IterTest extends TestCase
         );
     }
 
+    public function test_positions(): void
+    {
+        $i = iter([1, 6, 9, 10, 13, 15, 21, 23, 25, 31])->unwrap();
+        $this->assertEquals([3, 5, 8], $i->positions(fn($n) => $n % 5 === 0)->toList());
+    }
+
+    public function test_scan(): void
+    {
+        $nums = iter([1, 2, 3, 4, 5, 6])->unwrap();
+        $this->assertEquals(
+            [1, 3, 6, 10, 15, 21],
+            $nums->scan(0, fn($acc, $n) => $acc + $n)->toList()
+        );
+    }
+
+    public function test_intersperse(): void
+    {
+        $i = iter(["fizz", "buzz", "baz"])->unwrap();
+        $this->assertEquals(
+            ["fizz", "-", "buzz", "-", "baz"], $i->intersperse("-")->toList()
+        );
+
+        $nums = iter([0, 1, 2, 3, 4, 5])->unwrap();
+        $u = 0;
+        $this->assertEquals(
+            [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5],
+            $nums->intersperseWith(function () use (&$u): int { --$u; return $u; })->toList()
+        );
+    }
+
+    public function test_interleave(): void
+    {
+        $i = iter(["a", "b", "c", "d", "e", "f"])->unwrap();
+        $nums = iter(["1", "2", "3"])->unwrap();
+        $this->assertEquals(
+            ["a", "1", "b", "2", "c", "3", "d", "e", "f"],
+            $i->interleave($nums)->toList()
+        );
+
+        $this->assertEquals(
+            ["a", "1", "b", "2", "c", "3", "d"],
+            $i->interleaveShortest($nums)->toList()
+        );
+
+        $this->assertEquals(
+            ["1", "a", "2", "b", "3", "c"],
+            $nums->interleaveShortest($i)->toList()
+        );
+    }
+
     public function test_enumerate(): void
     {
         $i = iter(["foo", "bar", "baz"])->unwrap();
@@ -132,6 +197,18 @@ class IterTest extends TestCase
     {
         $i = iter([1, 4, 3, 3, 3, 7, 5, 5, 2, 6])->unwrap();
         $this->assertEquals([1, 4, 3, 7, 5, 2, 6], $i->dedup()->toList());
+
+        $i = iter(["a", "a", "t", "u", "v", "v", "v", "s"])->unwrap();
+        $this->assertEquals(["a", "t", "u", "v", "s"], $i->dedup()->toList());
+    }
+
+    public function test_dedup_with_count(): void
+    {
+        $i = iter([1, 4, 3, 3, 3, 7, 5, 5, 2, 6])->unwrap();
+        $this->assertEquals(
+            [[1, 1], [1, 4], [3, 3], [1, 7], [2, 5], [1, 2], [1, 6]],
+            $i->dedupWithCount()->map(fn($p) => [$p[0], $p[1]])->toList()
+        );
     }
 
     public function test_concat(): void
@@ -143,6 +220,45 @@ class IterTest extends TestCase
         $this->assertEquals(
             [0, 1, 2, 3, 12, 8, 9, 10],
             $iter1->concat($iter2, $iter3)->toList()
+        );
+    }
+
+    public function test_zip_with(): void
+    {
+        $lowers = ["a", "b", "c", "d"];
+        $uppers = ["A", "B", "C", "D", "E"];
+        $nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        $i = iter(new \ArrayIterator([$lowers, $uppers, $nums]))->unwrap();
+
+        $this->assertEquals(
+            ["A-a-1", "B-b-2", "C-c-3", "D-d-4"],
+            $i->zipWith(fn($zip) => "$zip[1]-$zip[0]-$zip[2]")->toList()
+        );
+    }
+
+    public function test_empty(): void
+    {
+        $this->assertTrue(iter(new \EmptyIterator())->unwrap()->isEmpty());
+    }
+
+    public function test_chunk_every(): void
+    {
+        $nums = generate(0, fn($n) => $n + 1);
+        $this->assertEquals(
+            [[0, 1], [2, 3], [4, 5], [6, 7]],
+            $nums->take(8)->chunkEvery(2)->toArray()
+        );
+        $this->assertEquals(
+            [[0, 1, 2], [2, 3, 4], [4, 5, 6]],
+            $nums->take(8)->chunkEvery(3, 2, discard: true)->toList()
+        );
+        $this->assertEquals(
+            [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 8]],
+            $nums->take(8)->chunkEvery(3, 2, leftover: [8])->toList()
+        );
+        $this->assertEquals(
+            [[0, 1, 2, 3], [4, 5, 0, 0]],
+            $nums->take(6)->chunkEvery(4, leftover: cycle([0])->unwrap())->toArray()
         );
     }
 
