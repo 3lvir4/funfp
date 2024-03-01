@@ -19,13 +19,13 @@ characters, lines, words etc...
 You can add this library as a local, per-project dependency to your project using [Composer](https://getcomposer.org/):
 
 ```
-composer require 3lvir4/php-range
+composer require 3lvir4/funfp
 ```
 
 If you only need this library during development, then you should add it as a development-time dependency:
 
 ```
-composer require --dev 3lvir4/php-range
+composer require --dev 3lvir4/funfp
 ```
 
 ## Wiki
