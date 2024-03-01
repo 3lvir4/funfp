@@ -7,8 +7,10 @@ namespace Elvir4\FunFp;
 use Elvir4\FunFp\Result\Err;
 use Elvir4\FunFp\Result\Ok;
 use Generator;
+use IteratorAggregate;
 use RuntimeException;
 use Throwable;
+use Traversable;
 
 /**
  * Represents a result of an operation that may either succeed (Ok) or fail (Err).
@@ -24,8 +26,9 @@ use Throwable;
  * @psalm-inheritors Ok|Err
  * @psalm-yield T
  * @psalm-suppress InvalidTemplateParam
+ * @implements IteratorAggregate<T>
  */
-abstract class Result
+abstract class Result implements IteratorAggregate
 {
     # region Constructors
 
@@ -323,4 +326,9 @@ abstract class Result
     abstract public function mapOr(mixed $default, callable $f): mixed;
 
     # endregion Maps
+
+    public function getIterator(): Traversable
+    {
+        if ($this->isOk()) yield $this->unwrap();
+    }
 }

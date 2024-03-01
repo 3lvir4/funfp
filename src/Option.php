@@ -8,7 +8,9 @@ use Elvir4\FunFp\Option\None;
 use Elvir4\FunFp\Option\Some;
 use Generator;
 use Iterator;
+use IteratorAggregate;
 use RuntimeException;
+use Traversable;
 
 /**
  * Represents an optional value that may or may not be present.
@@ -22,8 +24,9 @@ use RuntimeException;
  * @psalm-inheritors Some|None
  * @psalm-yield T
  * @psalm-suppress InvalidTemplateParam
+ * @implements IteratorAggregate<T>
  */
-abstract class Option
+abstract class Option implements IteratorAggregate
 {
     # region Constructors
 
@@ -361,4 +364,9 @@ abstract class Option
     abstract public function flatten(): Option;
 
     # endregion Maps
+
+    public function getIterator(): Traversable
+    {
+        if ($this->isSome()) yield $this->unwrap();
+    }
 }
