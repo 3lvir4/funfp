@@ -11,21 +11,21 @@ use Iterator;
 /**
  * @template TKey
  * @template TVal
- * @implements Iterator<int, array<TKey, TVal>>
- * @implements IterOps<int, array<TKey, TVal>>
+ * @implements Iterator<int, array<TVal>>
+ * @implements IterOps<int, array<TVal>>
  * @psalm-suppress all
  */
-class ChunkEvery implements Iterator, IterOps
+class ChunkEveryIter implements Iterator, IterOps
 {
     /**
-     * @use IterTrait<int, array<TKey, TVal>>
+     * @use IterTrait<int, array<TVal>>
      */
     use IterTrait;
 
     private int $index = -1;
 
     /**
-     * @var array<TKey, TVal>
+     * @var array<TVal>
      */
     private array $currentChunk = [];
 
