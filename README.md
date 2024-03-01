@@ -27,6 +27,11 @@ If you only need this library during development, then you should add it as a de
 ```
 composer require --dev 3lvir4/php-range
 ```
+
+## Wiki
+
+*work in progress...*
+
 ## Footnote
 
 The goal of this library is not to turn PHP into haskell or whatever. I tried to aim at specific
