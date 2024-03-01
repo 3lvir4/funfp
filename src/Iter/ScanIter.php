@@ -15,9 +15,8 @@ use Iterator;
  * @template UVal
  * @implements Iterator<TKey, UVal>
  * @implements IterOps<TKey, UVal>
- * @internal
  */
-class MapIter implements Iterator, \Countable, IterOps
+class ScanIter implements Iterator, IterOps
 {
     /**
      * @use IterTrait<TKey, UVal>
@@ -27,20 +26,34 @@ class MapIter implements Iterator, \Countable, IterOps
     /**
      * @var Iterator<TKey, TVal>
      */
-    protected Iterator $iterable;
+    private Iterator $iterator;
 
     /**
-     * @var Closure(TVal, TKey, Iterator<TKey, TVal>): UVal
+     * @var Closure(UVal, TVal, TKey): UVal
      */
     private Closure $fun;
 
     /**
-     * @param Iterator<TKey, TVal> $iterable
-     * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $fun
+     * @var UVal
      */
-    public function __construct(Iterator $iterable, callable $fun) {
-        $this->iterable = $iterable;
+    private mixed $acc;
+
+    /**
+     * @var UVal
+     */
+    private mixed $initialValue;
+
+    /**
+     * @param Iterator<TKey, TVal> $iterator
+     * @param UVal $initialValue
+     * @param callable(UVal, TVal, TKey): UVal $fun
+     */
+    public function __construct(Iterator $iterator, mixed $initialValue, callable $fun)
+    {
+        $this->iterator = $iterator;
         $this->fun = $fun(...);
+        $this->acc = $initialValue;
+        $this->initialValue = $initialValue;
     }
 
     /**
@@ -48,12 +61,8 @@ class MapIter implements Iterator, \Countable, IterOps
      */
     #[\Override] public function current(): mixed
     {
-        return call_user_func(
-            $this->fun,
-            $this->iterable->current(),
-            $this->iterable->key(),
-            $this->iterable
-        );
+        $this->acc = call_user_func($this->fun, $this->acc, $this->iterator->current(), $this->iterator->key());
+        return $this->acc;
     }
 
     /**
@@ -61,7 +70,7 @@ class MapIter implements Iterator, \Countable, IterOps
      */
     #[\Override] public function next(): void
     {
-        $this->iterable->next();
+        $this->iterator->next();
     }
 
     /**
@@ -69,7 +78,7 @@ class MapIter implements Iterator, \Countable, IterOps
      */
     #[\Override] public function key(): mixed
     {
-        return $this->iterable->key();
+        return $this->iterator->key();
     }
 
     /**
@@ -77,7 +86,7 @@ class MapIter implements Iterator, \Countable, IterOps
      */
     #[\Override] public function valid(): bool
     {
-        return $this->iterable->valid();
+        return $this->iterator->valid();
     }
 
     /**
@@ -85,13 +94,14 @@ class MapIter implements Iterator, \Countable, IterOps
      */
     #[\Override] public function rewind(): void
     {
-        $this->iterable->rewind();
+        $this->acc = $this->initialValue;
+        $this->iterator->rewind();
     }
 
     /**
      * @inheritDoc
      */
-    #[\Override] public function getIter(): Iterator
+    public function getIter(): Iterator
     {
         return $this;
     }

@@ -4,21 +4,31 @@ declare(strict_types=1);
 
 namespace Elvir4\FunFp;
 
+use ArrayAccess;
 use Elvir4\FunFp\Contracts\FromIterator;
 use Elvir4\FunFp\Contracts\TryFromIterator;
 use Elvir4\FunFp\Iter\ChunkByIter;
+use Elvir4\FunFp\Iter\ChunkEvery;
 use Elvir4\FunFp\Iter\ConcatIter;
 use Elvir4\FunFp\Iter\CycleIter;
 use Elvir4\FunFp\Iter\DedupByIter;
 use Elvir4\FunFp\Iter\DedupIter;
+use Elvir4\FunFp\Iter\DedupWithCountIter;
 use Elvir4\FunFp\Iter\EachIter;
 use Elvir4\FunFp\Iter\EmptyIter;
 use Elvir4\FunFp\Iter\EnumerateIter;
 use Elvir4\FunFp\Iter\FilterIter;
 use Elvir4\FunFp\Iter\FlatMapIter;
 use Elvir4\FunFp\Iter\FlattenIter;
+use Elvir4\FunFp\Iter\InterleaveIter;
+use Elvir4\FunFp\Iter\InterleaveShortestIter;
+use Elvir4\FunFp\Iter\IntersperseIter;
+use Elvir4\FunFp\Iter\IntersperseWithIter;
 use Elvir4\FunFp\Iter\KeysIter;
+use Elvir4\FunFp\Iter\MapEveryIter;
 use Elvir4\FunFp\Iter\MapIter;
+use Elvir4\FunFp\Iter\PositionsIter;
+use Elvir4\FunFp\Iter\ScanIter;
 use Elvir4\FunFp\Iter\SkipEveryIter;
 use Elvir4\FunFp\Iter\SkipIter;
 use Elvir4\FunFp\Iter\SkipWhileIter;
@@ -32,14 +42,19 @@ use Elvir4\FunFp\Iter\UniqueIter;
 use Elvir4\FunFp\Iter\ValuesIter;
 use Elvir4\FunFp\Iter\ZipIter;
 use Elvir4\FunFp\Iter\ZipMultipleIter;
+use Elvir4\FunFp\Iter\ZipWithIter;
+use Exception;
 use Iterator;
+use RuntimeException;
+use SplObjectStorage;
 use Throwable;
+use function Elvir4\FunFp\Helpers\op;
 use function min;
 use function uasort;
 use function usort;
 
 /**
- * @uses \Elvir4\FunFp\IterOps
+ * @uses IterOps
  * @template-covariant TKey
  * @template-covariant TVal
  * @psalm-require-implements IterOps
@@ -56,6 +71,17 @@ trait IterTrait
     public function map(callable $f): IterOps
     {
         return new MapIter($this->getIter(), $f);
+    }
+
+    /**
+     * @template UVal
+     * @param int $step
+     * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
+     * @return IterOps<TKey, UVal>
+     */
+    public function mapEvery(int $step, callable $f): IterOps
+    {
+        return new MapEveryIter($this->getIter(), $step, $f);
     }
 
     /**
@@ -114,6 +140,17 @@ trait IterTrait
     }
 
     /**
+     * @template UVal
+     * @param UVal $initialValue
+     * @param callable(UVal, TVal, TKey): UVal $f
+     * @return IterOps<TKey, UVal>
+     */
+    public function scan(mixed $initialValue, callable $f): IterOps
+    {
+        return new ScanIter($this->getIter(), $initialValue, $f);
+    }
+
+    /**
      * @return IterOps<TKey, TVal>
      */
     public function unique(): IterOps
@@ -148,6 +185,14 @@ trait IterTrait
     }
 
     /**
+     * @return IterOps<TKey, Pair<int, TVal>>
+     */
+    public function dedupWithCount(): IterOps
+    {
+        return new DedupWithCountIter($this->getIter());
+    }
+
+    /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): mixed $f
      * @param bool $preserveKeys
      * @return IterOps<int, array<TVal>>
@@ -155,6 +200,24 @@ trait IterTrait
     public function chunkBy(callable $f, bool $preserveKeys = false): IterOps
     {
         return new ChunkByIter($this->getIter(), $f, $preserveKeys);
+    }
+
+    /**
+     * @param int $count
+     * @param int|null $step
+     * @param bool $discard
+     * @param iterable<TKey, TVal> $leftover
+     * @param bool $preserveKeys
+     * @return IterOps<int, array<TVal>>
+     */
+    public function chunkEvery(
+        int $count,
+        ?int $step = null,
+        bool $discard = false,
+        iterable $leftover = [],
+        bool $preserveKeys = false
+    ): IterOps {
+        return new ChunkEvery($this->getIter(), $count, $step ?? $count, $discard, $leftover, $preserveKeys);
     }
 
     /**
@@ -177,12 +240,39 @@ trait IterTrait
      * @template UKey
      * @template UVal
      * @param Iterator<UKey, UVal>|IterOps<UKey, UVal> $iterator
-     * @return IterOps<array{0: TKey, 1: UKey}, array{0: TVal, 1: UVal}>
-     * @psalm-return IterOps<list{TKey, UKey}, list{TVal, UVal}>
+     * @return IterOps<Pair<TKey, UKey>, Pair<TVal, UVal>>
      */
     public function zip(Iterator|IterOps $iterator): IterOps
     {
         return new ZipIter(
+            $this->getIter(),
+            $iterator instanceof IterOps
+                ? $iterator->getIter()
+                : $iterator
+        );
+    }
+
+    /**
+     * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> $iterator
+     * @return IterOps<TKey, TVal>
+     */
+    public function interleave(Iterator|IterOps $iterator): IterOps
+    {
+        return new InterleaveIter(
+            $this->getIter(),
+            $iterator instanceof IterOps
+                ? $iterator->getIter()
+                : $iterator
+        );
+    }
+
+    /**
+     * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> $iterator
+     * @return IterOps<TKey, TVal>
+     */
+    public function interleaveShortest(Iterator|IterOps $iterator): IterOps
+    {
+        return new InterleaveShortestIter(
             $this->getIter(),
             $iterator instanceof IterOps
                 ? $iterator->getIter()
@@ -201,11 +291,36 @@ trait IterTrait
     }
 
     /**
-     * @return IterOps<TKey, list{int, TVal}>
+     * @template UVal
+     * @param callable(array): UVal $f
+     * @return IterOps<int, UVal>
      */
-    public function enumerate(): IterOps
+    public function zipWith(callable $f): IterOps
     {
-        return new EnumerateIter($this->getIter());
+        $i = $this->getIter(); $i->rewind();
+        if (!is_iterable($i->current())) {
+            throw new RuntimeException("Call of `IterOps::zipWith` on iterator over non-iterables.");
+        }
+        /** @var Iterator<iterable> $i */
+        return new ZipWithIter($i, $f);
+    }
+
+    /**
+     * @param int $start
+     * @return IterOps<TKey, Pair<int, TVal>>
+     */
+    public function enumerate(int $start = 0): IterOps
+    {
+        return new EnumerateIter($this->getIter(), $start);
+    }
+
+    /**
+     * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
+     * @return IterOps<int, TKey>
+     */
+    public function positions(callable $predicate): IterOps
+    {
+        return new PositionsIter($this->getIter(), $predicate);
     }
 
     /**
@@ -277,6 +392,24 @@ trait IterTrait
     }
 
     /**
+     * @param TVal $sep
+     * @return IterOps<TKey, TVal>
+     */
+    public function intersperse(mixed $sep): IterOps
+    {
+        return new IntersperseIter($this->getIter(), $sep);
+    }
+
+    /**
+     * @param callable(): TVal $sep
+     * @return IterOps<TKey, TVal>
+     */
+    public function intersperseWith(callable $sep): IterOps
+    {
+        return new IntersperseWithIter($this->getIter(), $sep);
+    }
+
+    /**
      * Flattens one level of an iterator of iterators.
      * @return IterOps
      * @psalm-suppress MixedArgumentTypeCoercion
@@ -320,14 +453,14 @@ trait IterTrait
     /**
      * @template U
      * @param U $initialValue
-     * @param callable(U, TVal): U $f
+     * @param callable(U, TVal, TKey): U $f
      * @return U
      */
     public function fold(mixed $initialValue, callable $f): mixed
     {
         $acc = $initialValue;
-        foreach ($this->getIter() as $value) {
-            $acc = call_user_func($f, $acc, $value);
+        foreach ($this->getIter() as $key => $value) {
+            $acc = call_user_func($f, $acc, $value, $key);
         }
         return $acc;
     }
@@ -350,10 +483,10 @@ trait IterTrait
     }
 
     /**
-     * Iterates over this without doing anything else.
+     * Iterates over without doing anything else.
      * @return void
      */
-    public function consume(): void
+    public function run(): void
     {
         $iter = $this->getIter(); $iter->rewind();
         while ($iter->valid()) {
@@ -367,6 +500,7 @@ trait IterTrait
      * @template D
      * @param class-string<D> $dest
      * @return FromIterator<D>
+     * @psalm-suppress MixedInferredReturnType, MixedMethodCall
      */
     public function collect(string $dest): mixed
     {
@@ -471,7 +605,7 @@ trait IterTrait
     public function isEmpty(): bool
     {
         $iter = $this->getIter();
-        return $iter->valid();
+        return !$iter->valid();
     }
 
     /**
@@ -495,7 +629,7 @@ trait IterTrait
     }
 
     /**
-     * @param ?callable(TVal, TVal): bool $comparator
+     * @param ?callable(TVal, TVal): (int|float) $comparator
      * @return Option<TVal>
      */
     public function min(?callable $comparator): Option
@@ -522,7 +656,7 @@ trait IterTrait
     }
 
     /**
-     * @param ?callable(TVal, TVal): bool $comparator
+     * @param ?callable(TVal, TVal): (int|float) $comparator
      * @return Option<TVal>
      */
     public function max(?callable $comparator): Option
@@ -549,6 +683,78 @@ trait IterTrait
     }
 
     /**
+     * @param ?callable(TVal, TVal): (int|float) $comparator
+     * @return Option<int<0, max>>
+     * @psalm-suppress InvalidReturnType
+     */
+    public function positionMin(?callable $comparator): Option
+    {
+        $iter = $this->getIter(); $iter->rewind(); $min = null;
+        $i = 0; $iMin = null;
+        if ($iter->valid()) {
+            $min = $iter->current();
+            $iMin = 0;
+            $iter->next();
+        }
+
+        if ($comparator === null) {
+            while ($iter->valid()) {
+                $curr = $iter->current(); $i++;
+                if ($min > $curr) {
+                    $iMin = $i;
+                    $min = $curr;
+                }
+            }
+        } else {
+            while ($iter->valid()) {
+                $curr = $iter->current(); $i++;
+                if ($comparator($min, $curr) > 0) {
+                    $iMin = $i;
+                    $min = $curr;
+                }
+            }
+        }
+
+        return Option::wrap($iMin);
+    }
+
+    /**
+     * @param ?callable(TVal, TVal): (int|float) $comparator
+     * @return Option<int<0, max>>
+     * @psalm-suppress InvalidReturnType
+     */
+    public function positionMax(?callable $comparator): Option
+    {
+        $iter = $this->getIter(); $iter->rewind(); $max = null;
+        $i = 0; $iMax = null;
+        if ($iter->valid()) {
+            $max = $iter->current();
+            $iMax = 0;
+            $iter->next();
+        }
+
+        if ($comparator === null) {
+            while ($iter->valid()) {
+                $curr = $iter->current(); $i++;
+                if ($max < $curr) {
+                    $max = $curr;
+                    $iMax = $i;
+                }
+            }
+        } else {
+            while ($iter->valid()) {
+                $curr = $iter->current(); $i++;
+                if ($comparator($max, $curr) < 0) {
+                    $max = $curr;
+                    $iMax = $i;
+                }
+            }
+        }
+
+        return Option::wrap($iMax);
+    }
+
+    /**
      * @param string $separator
      * @return string
      */
@@ -558,6 +764,23 @@ trait IterTrait
         while ($iter->valid()) {
             /** @psalm-suppress MixedOperand */
             $str .= $separator . $iter->current();
+            $iter->next();
+        }
+        return mb_substr($str, mb_strlen($separator));
+    }
+
+    /**
+     * @template UVal
+     * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
+     * @param string $separator
+     * @return string
+     */
+    public function mapJoin(callable $f, string $separator = ""): string
+    {
+        $str = ""; $iter = $this->getIter(); $iter->rewind();
+        while ($iter->valid()) {
+            /** @psalm-suppress MixedOperand */
+            $str .= $separator . $f($iter->current(), $iter->key(), $iter);
             $iter->next();
         }
         return mb_substr($str, mb_strlen($separator));
@@ -673,37 +896,6 @@ trait IterTrait
     }
 
     /**
-     * @param int $count
-     * @param bool $preserveKeys
-     * @return TVal[]
-     * @psalm-suppress all
-     */
-    public function takeRandom(int $count = 1, bool $preserveKeys = false): array
-    {
-        // TODO: Rework all of it
-        if ($count === 0) return [];
-        $arr = $this->toArray();
-        if (count($arr) === 0) return [];
-        if ($count === 1) return [$arr[array_rand($arr)]];
-
-        $count = min(count($arr), $count);
-        /** @var array<TKey> $randKeys */
-        $randKeys = array_rand($arr, $count);
-
-        $res = [];
-        if ($preserveKeys) {
-            foreach ($randKeys as $key) {
-                $res[$key] = $arr[$key];
-            }
-        } else {
-            foreach ($randKeys as $key) {
-                $res[] = $arr[$key];
-            }
-        }
-        return $res;
-    }
-
-    /**
      * @return Option<TVal>
      */
     public function first(): Option
@@ -728,6 +920,62 @@ trait IterTrait
             $iter->next();
         }
         return Option::wrap($item);
+    }
+
+    /**
+     * @psalm-suppress all
+     * @return Option<int|float|array>
+     */
+    public function sum(): Option
+    {
+        $iter = $this->getIter(); $iter->rewind();
+        if (!$iter->valid()) return Option::None();
+
+        $acc = $iter->current();
+        $iter->next();
+        while ($iter->valid()) {
+            $acc += $iter->current();
+            $iter->next();
+        }
+        return Option::Some($acc);
+    }
+
+    /**
+     * @psalm-suppress all
+     * @return Option<int|float|array>
+     */
+    public function product(): Option
+    {
+        $iter = $this->getIter(); $iter->rewind();
+        if (!$iter->valid()) return Option::None();
+
+        $acc = $iter->current();
+        $iter->next();
+        while ($iter->valid()) {
+            $acc *= $iter->current();
+            $iter->next();
+        }
+        return Option::Some($acc);
+    }
+
+    /**
+     * @psalm-suppress all
+     * @return Option<int|float>
+     */
+    public function average(): Option
+    {
+        $iter = $this->getIter(); $iter->rewind();
+        if (!$iter->valid()) return Option::None();
+
+        $acc = $iter->current();
+        $total = 1;
+        $iter->next();
+        while ($iter->valid()) {
+            $acc += $iter->current();
+            $total++;
+            $iter->next();
+        }
+        return Option::Some($acc / $total);
     }
 
     # endregion Consumers

@@ -6,6 +6,7 @@ namespace Elvir4\FunFp;
 
 use Elvir4\FunFp\Contracts\FromIterator;
 use Elvir4\FunFp\Contracts\TryFromIterator;
+use Elvir4\FunFp\Iter\IntersperseIter;
 use Iterator;
 use Throwable;
 
@@ -24,6 +25,14 @@ interface IterOps
      * @return IterOps<TKey, UVal>
      */
     public function map(callable $f): IterOps;
+
+    /**
+     * @template UVal
+     * @param int $step
+     * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
+     * @return IterOps<TKey, UVal>
+     */
+    public function mapEvery(int $step, callable $f): IterOps;
 
     /**
      * @template UKey
@@ -56,6 +65,14 @@ interface IterOps
     public function keys(): IterOps;
 
     /**
+     * @template UVal
+     * @param UVal $initialValue
+     * @param callable(UVal, TVal, TKey): UVal $f
+     * @return IterOps<TKey, UVal>
+     */
+    public function scan(mixed $initialValue, callable $f): IterOps;
+
+    /**
      * @return IterOps<TKey, TVal>
      */
     public function unique(): IterOps;
@@ -78,11 +95,32 @@ interface IterOps
     public function dedupBy(callable $f): IterOps;
 
     /**
+     * @return IterOps<TKey, Pair<int, TVal>>
+     */
+    public function dedupWithCount(): IterOps;
+
+    /**
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): mixed $f
      * @param bool $preserveKeys
      * @return IterOps<int, array<TVal>>
      */
     public function chunkBy(callable $f, bool $preserveKeys = false): IterOps;
+
+    /**
+     * @param int $count
+     * @param int|null $step
+     * @param bool $discard
+     * @param iterable<TKey, TVal> $leftover
+     * @param bool $preserveKeys
+     * @return IterOps<int, array<TVal>>
+     */
+    public function chunkEvery(
+        int $count,
+        ?int $step = null,
+        bool $discard = false,
+        iterable $leftover = [],
+        bool $preserveKeys = false
+    ): IterOps;
 
     /**
      * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> ...$iterators
@@ -94,10 +132,21 @@ interface IterOps
      * @template UKey
      * @template UVal
      * @param Iterator<UKey, UVal>|IterOps<UKey, UVal> $iterator
-     * @return IterOps<array{0: TKey, 1: UKey}, array{0: TVal, 1: UVal}>
-     * @psalm-return IterOps<list{TKey, UKey}, list{TVal, UVal}>
+     * @return IterOps<Pair<TKey, UKey>, Pair<TVal, UVal>>
      */
     public function zip(Iterator|IterOps $iterator): IterOps;
+
+    /**
+     * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> $iterator
+     * @return IterOps<TKey, TVal>
+     */
+    public function interleave(Iterator|IterOps $iterator): IterOps;
+
+    /**
+     * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> $iterator
+     * @return IterOps<TKey, TVal>
+     */
+    public function interleaveShortest(Iterator|IterOps $iterator): IterOps;
 
     /**
      * @param Iterator|IterOps ...$iterators
@@ -106,10 +155,23 @@ interface IterOps
     public function zipMultiple(Iterator|IterOps ...$iterators): IterOps;
 
     /**
-     * @return IterOps<TKey, array{0: int, 1: TVal}>
-     * @psalm-return IterOps<TKey, list{int, TVal}>
+     * @template UVal
+     * @param callable(array): UVal $f
+     * @return IterOps<int, UVal>
      */
-    public function enumerate(): IterOps;
+    public function zipWith(callable $f): IterOps;
+
+    /**
+     * @param int $start
+     * @return IterOps<TKey, Pair<int, TVal>>
+     */
+    public function enumerate(int $start = 0): IterOps;
+
+    /**
+     * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
+     * @return IterOps<int, TKey>
+     */
+    public function positions(callable $predicate): IterOps;
 
     /**
      * @param int $n
@@ -155,6 +217,18 @@ interface IterOps
     public function slice(int $start, int $amount = -1): IterOps;
 
     /**
+     * @param TVal $sep
+     * @return IterOps<TKey, TVal>
+     */
+    public function intersperse(mixed $sep): IterOps;
+
+    /**
+     * @param callable(): TVal $sep
+     * @return IterOps<TKey, TVal>
+     */
+    public function intersperseWith(callable $sep): IterOps;
+
+    /**
      * Flattens one level of an iterator of iterators.
      * @return IterOps
      */
@@ -185,7 +259,7 @@ interface IterOps
     /**
      * @template U
      * @param U $initialValue
-     * @param callable(U, TVal): U $f
+     * @param callable(U, TVal, TKey): U $f
      * @return U
      */
     public function fold(mixed $initialValue, callable $f): mixed;
@@ -197,10 +271,10 @@ interface IterOps
     public function reduce(callable $f): Option;
 
     /**
-     * Iterates over this without doing anything else.
+     * Iterates over without doing anything else.
      * @return void
      */
-    public function consume(): void;
+    public function run(): void;
 
     /**
      * @template D
@@ -268,13 +342,13 @@ interface IterOps
     public function nth(int $n): Option;
 
     /**
-     * @param ?callable(TVal, TVal): bool $comparator
+     * @param ?callable(TVal, TVal): (int|float) $comparator
      * @return Option<TVal>
      */
     public function min(?callable $comparator): Option;
 
     /**
-     * @param ?callable(TVal, TVal): bool $comparator
+     * @param ?callable(TVal, TVal): (int|float) $comparator
      * @return Option<TVal>
      */
     public function max(?callable $comparator): Option;
@@ -284,6 +358,14 @@ interface IterOps
      * @return string
      */
     public function join(string $separator = ""): string;
+
+    /**
+     * @template UVal
+     * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
+     * @param string $separator
+     * @return string
+     */
+    public function mapJoin(callable $f, string $separator = ""): string;
 
     /**
      * @param callable(TVal): bool $predicate
@@ -328,14 +410,6 @@ interface IterOps
     public function all(callable $predicate): bool;
 
     /**
-     * @param int $count
-     * @param bool $preserveKeys
-     * @return TVal[]
-     * @psalm-return list<TVal>
-     */
-    public function takeRandom(int $count = 1, bool $preserveKeys = false): array;
-
-    /**
      * @return Option<TVal>
      */
     public function first(): Option;
@@ -344,6 +418,23 @@ interface IterOps
      * @return Option<TVal>
      */
     public function last(): Option;
+
+    /**
+     * @return Option<int|float|array>
+     */
+    public function sum(): Option;
+
+    /**
+     * @psalm-suppress all
+     * @return Option<int|float|array>
+     */
+    public function product(): Option;
+
+    /**
+     * @psalm-suppress all
+     * @return Option<int|float>
+     */
+    public function average(): Option;
 
     # endregion Consumers
 
