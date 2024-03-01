@@ -6,6 +6,7 @@ use Elvir4\FunFp\Helpers\Arr;
 use Elvir4\FunFp\Iter\DedupWithCountIter;
 use Elvir4\FunFp\Iter\RewindableIter;
 use Elvir4\FunFp\Option;
+use Elvir4\FunFp\Pair;
 use PHPUnit\Framework\TestCase;
 use function Elvir4\FunFp\constructors\cycle;
 use function Elvir4\FunFp\constructors\generate;
@@ -187,7 +188,7 @@ class IterTest extends TestCase
     {
         $i = iter(["foo", "bar", "baz"])->unwrap();
         $this->assertEquals(
-            [[0, "foo"], [1, "bar"], [2, "baz"]],
+            [new Pair(0, "foo"), new Pair(1, "bar"), new Pair(2, "baz")],
             $i->enumerate()->toList()
         );
         $this->assertEquals([], iter([])->unwrap()->enumerate()->toList());
@@ -318,26 +319,26 @@ class IterTest extends TestCase
 
         $this->assertEquals(
             [
-                ["Monday", 1],
-                ["Tuesday", 2],
-                ["Wednesday", 3],
-                ["Thursday", 4],
-                ["Friday", 5],
-                ["Saturday", 6],
-                ["Sunday", 7]
+                new Pair("Monday", 1),
+                new Pair("Tuesday", 2),
+                new Pair("Wednesday", 3),
+                new Pair("Thursday", 4),
+                new Pair("Friday", 5),
+                new Pair("Saturday", 6),
+                new Pair("Sunday", 7)
             ],
             $iterDays->zip($iterNums)->toList()
         );
 
         $this->assertEquals(
             [
-                ["monday", 2],
-                ["tuesday", 4],
-                ["wednesday", 6],
-                ["thursday", 8],
-                ["friday", 10],
-                ["saturday", 12],
-                ["sunday", 14]
+                new Pair("monday", 2),
+                new Pair("tuesday", 4),
+                new Pair("wednesday", 6),
+                new Pair("thursday", 8),
+                new Pair("friday", 10),
+                new Pair("saturday", 12),
+                new Pair("sunday", 14)
             ],
             $iterDays->map(fn($d) => lcfirst($d))->zip($iterNums->map(fn($n) => 2 * $n))->toList()
         );
@@ -346,20 +347,20 @@ class IterTest extends TestCase
 
         $this->assertEquals(
             [
-                ["Monday", 2],
-                ["Tuesday", 4],
-                ["Wednesday", 6],
-                ["Thursday", 8],
-                ["Friday", 10]
+                new Pair("Monday", 2),
+                new Pair("Tuesday", 4),
+                new Pair("Wednesday", 6),
+                new Pair("Thursday", 8),
+                new Pair("Friday", 10)
             ],
             $iterDays->zip($iterNums2)->toList()
         );
 
         $this->assertEquals(
             [
-                ["Tuesday", 2],
-                ["Thursday", 4],
-                ["Saturday", 6],
+                new Pair("Tuesday", 2),
+                new Pair("Thursday", 4),
+                new Pair("Saturday", 6),
             ],
             $iterDays->zip($iterNums)->filter(fn($b) => $b[1] % 2 === 0)->toList()
         );
@@ -384,7 +385,7 @@ class IterTest extends TestCase
         $iterNums = iter([1, 2, 3, 4, 5, 6, 7])->unwrap();
 
         $this->assertEquals(
-            $iterDays->zip($iterNums)->toList(),
+            $iterDays->zip($iterNums)->map(fn($p) => [...$p])->toList(),
             $iterDays->zipMultiple($iterNums)->toList()
         );
 
