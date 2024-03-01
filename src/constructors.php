@@ -137,13 +137,13 @@ function repeatWith(callable $f): IterOps
  * @param callable(T): T $genFn
  * @return Traversable<int, T>&IterOps<int, T>
  */
-function generate(mixed $initialValue, callable $genFn): IterOps
+function generate(mixed $initialValue, callable $genFn): Traversable&IterOps
 {
     return new GenerateIter($initialValue, $genFn);
 }
 
 /**
- * Creates an IterOps implementation that cycles indefinitely through the elements of the given iterable.
+ * Creates an IterOps implementation that repeats endlessly the given iterable.
  * It wraps the creation process in a Result object to handle any potential exceptions that may occur.
  *
  * Example:
@@ -181,7 +181,7 @@ function cycle(iterable $iterable): Result
  * @template TVal
  * @param iterable<TKey> $keys
  * @param iterable<TVal> $values
- * @return Result<IterOps<TKey, TVal>, Throwable>
+ * @return Result<IterOps<TKey, TVal>&Traversable<TKey, TVal>, Throwable>
  */
 function zipKeyValues(iterable $keys, iterable $values): Result
 {
@@ -199,7 +199,7 @@ function zipKeyValues(iterable $keys, iterable $values): Result
  * @param string $str
  * @return Traversable<int, int>&IterOps<int, int>
  */
-function bytes(string $str): IterOps
+function bytes(string $str): Traversable&IterOps
 {
     return new Iter(new BytesIterator($str));
 }
@@ -211,7 +211,7 @@ function bytes(string $str): IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function chars(string $str): IterOps
+function chars(string $str): Traversable&IterOps
 {
     return new Iter(new Utf8CharsIterator($str));
 }
@@ -223,7 +223,7 @@ function chars(string $str): IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function lines(string $str): IterOps
+function lines(string $str): Traversable&IterOps
 {
     return new Iter(new Utf8LinesIterator($str));
 }
@@ -235,7 +235,7 @@ function lines(string $str): IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function words(string $str): IterOps
+function words(string $str): Traversable&IterOps
 {
     return new Iter(new Utf8WordsIterator($str));
 }
@@ -246,7 +246,7 @@ function words(string $str): IterOps
  * @param string $str
  * @return Traversable<int, int>&IterOps<int, int>
  */
-function codepoints(string $str): IterOps
+function codepoints(string $str): Traversable&IterOps
 {
     return new Iter(new Utf8CodepointsIterator($str));
 }
@@ -257,7 +257,7 @@ function codepoints(string $str): IterOps
  * @param string $str
  * @return Traversable<int, string>&IterOps<int, string>
  */
-function byteChars(string $str): IterOps
+function byteChars(string $str): Traversable&IterOps
 {
     return new Iter(new AsciiStringIterator($str));
 }

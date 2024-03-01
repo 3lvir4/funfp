@@ -46,7 +46,7 @@ class SortedIter extends IteratorIterator implements IterOps
 
     /**
      * @inheritDoc
-     * @psalm-suppress InvalidReturnStatement, InvalidReturnType, MixedArgumentTypeCoercion
+     * @psalm-suppress InvalidReturnStatement, InvalidReturnType
      */
     public function getIter(): Iterator
     {
@@ -55,22 +55,5 @@ class SortedIter extends IteratorIterator implements IterOps
         } else {
             return new \ArrayIterator($this->toSortedList($this->comparator));
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toList(): array
-    {
-        return iterator_to_array($this, false);
-    }
-
-    /**
-     * @inheritDoc
-     * @psalm-suppress MixedReturnTypeCoercion
-     */
-    public function toArray(): array
-    {
-        return iterator_to_array($this, true);
     }
 }

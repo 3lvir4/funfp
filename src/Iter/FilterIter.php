@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Elvir4\FunFp\Iter;
 
 use CallbackFilterIterator;
-use Closure;
 use Countable;
 use Elvir4\FunFp\IterOps;
 use Elvir4\FunFp\IterTrait;
