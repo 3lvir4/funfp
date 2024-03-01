@@ -32,6 +32,11 @@ class SortedIter extends IteratorIterator implements IterOps
     private bool $preserveKeys;
 
     /**
+     * @var null|array<TVal>
+     */
+    private ?array $items = null;
+
+    /**
      * @param Iterator<TKey, TVal> $iterator
      * @param callable(TVal, TVal): int $comparator
      * @param bool $preserveKeys
@@ -51,9 +56,13 @@ class SortedIter extends IteratorIterator implements IterOps
     public function getIter(): Iterator
     {
         if ($this->preserveKeys) {
-            return new \ArrayIterator($this->toSortedArray($this->comparator));
+            $this->items = $this->items ?? iterator_to_array($this->getInnerIterator());
+            uasort($this->items, $this->comparator);
+            return new \ArrayIterator($this->items);
         } else {
-            return new \ArrayIterator($this->toSortedList($this->comparator));
+            $this->items = $this->items ?? iterator_to_array($this->getInnerIterator(), false);
+            usort($this->items, $this->comparator);
+            return new \ArrayIterator($this->items);
         }
     }
 }
