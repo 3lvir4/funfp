@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+        configVersion="3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://www.phpdoc.org"
+>
+    <title>FunFP API</title>
+    <paths>
+        <output>build/docs</output>
+    </paths>
+    <version number="0.1.0">
+        <api format="php" default-package-name="FunFP">
+            <source dsn=".">
+                <path>src</path>
+            </source>
+            <output>api</output>
+            <ignore-tags>
+                <ignore-tag>psalm-param</ignore-tag>
+                <ignore-tag>psalm-return</ignore-tag>
+                <ignore-tag>psalm-suppress</ignore-tag>
+                <ignore-tag>psalm-yield</ignore-tag>
+                <ignore-tag>psalm-inheritors</ignore-tag>
+            </ignore-tags>
+        </api>
+    </version>
+    <setting name="template.color" value="deep-purple"/>
+</phpdocumentor>
