@@ -178,11 +178,32 @@ interface IterOps
     public function uniqueBy(callable $f): IterOps;
 
     /**
+     * Creates a new iterator that only emits items if they are different from the previous.
+     * It uses loose comparison if the values are objects (otherwise, it uses strict comparison).
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 3, 2, 1])->unwrap();
+     * $deduplicated = $items->dedup();
+     * // $deduplicated->toList() results in [1, 2, 3, 2, 1]
+     * ```
+     *
      * @return IterOps<TKey, TVal>
      */
     public function dedup(): IterOps;
 
     /**
+     * Works like {@see IterOps::dedup()} except that it only emits items if
+     * the result of calling the given function $f on the value is different from the result of calling $f
+     * on the previously emitted value.
+     *
+     * Example:
+     * ```
+     * $items = iter([[1, 'x'], [2, 'y'], [2, 'z'], [1, 'x']])->unwrap();
+     * $deduplicated = $items->dedupBy(fn($item) => $item[0]);
+     * // $deduplicated->toList() results in [[1, 'x'], [2, 'y'], [1, 'x']]
+     * ```
+     *
      * @param callable(TVal): mixed $f
      * @return IterOps<TKey, TVal>
      */
