@@ -127,6 +127,17 @@ interface IterOps
     public function keys(): IterOps;
 
     /**
+     * Creates a new iterator that applies the given function to each element, emits the result, and uses the same result
+     * as the accumulator for the next computation. The given $initialValue is used as the starting value for the accumulator.
+     * The function is given at most 3 arguments, in order: the accumulator value, the value of the current element, and the key.
+     * It needs to return the new accumulator value for the next computation.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5, 6])->unwrap();
+     * $scanned = $items->scan(0, fn($acc, $val) => $acc + $val);
+     * // $scanned->toList() results in [1, 3, 6, 10, 15, 21]
+     * ```
      * @template UVal
      * @param UVal $initialValue
      * @param callable(UVal, TVal, TKey): UVal $f
