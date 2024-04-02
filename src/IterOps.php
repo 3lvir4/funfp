@@ -113,11 +113,15 @@ interface IterOps
     public function reject(callable $predicate): IterOps;
 
     /**
+     * Creates an iterator over the values only, replacing the keys by a 0-based index.
+     *
      * @return IterOps<int, TVal>
      */
     public function values(): IterOps;
 
     /**
+     * Creates an iterator over the keys of the iterator.
+     *
      * @return IterOps<int, TKey>
      */
     public function keys(): IterOps;
