@@ -146,11 +146,32 @@ interface IterOps
     public function scan(mixed $initialValue, callable $f): IterOps;
 
     /**
+     * Creates a new iterator that only emits values if they are unique.
+     * It uses loose comparison if the values are objects (otherwise, it uses strict comparison).
+     *
+     * Example:
+     * ```
+     * $items = iter([0,1,0,0,0,1,1,2,0,1,1,0,1])->unwrap();
+     * $res = $items->unique();
+     * // $res->toList() results in [0,1,2]
+     * ```
+     *
      * @return IterOps<TKey, TVal>
      */
     public function unique(): IterOps;
 
     /**
+     * Works like {@see IterOps::unique()} except that it only emits values if they are unique according to the result of applying
+     * the given callable $f to each value. Values are considered unique if the result of applying $f to them
+     * is distinct from the result of applying $f to any previously emitted value.
+     *
+     * Example:
+     * ```
+     * $items = iter([['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane'], ['id' => 1, 'name' => 'John']]);
+     * $uniqueById = $items->uniqueBy(fn($item) => $item['id']);
+     * // $uniqueById->toArray() results in [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']]
+     * ```
+     *
      * @param callable(TVal): mixed $f
      * @return IterOps<TKey, TVal>
      */
