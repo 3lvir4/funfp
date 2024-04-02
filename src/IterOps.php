@@ -80,12 +80,33 @@ interface IterOps
     public function flatMap(callable $f): IterOps;
 
     /**
+     * Creates a new iterator containing only the items from this iterator that satisfy the given predicate.
+     * The predicate function is given at most 3 arguments, in order: the value, the key, and the iterator itself.
+     * If the predicate returns true, the item will be included in the resulting iterator; otherwise,
+     * it will be excluded.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $filtered = $items->filter(fn($n) => $n % 2 === 0);
+     * // $filtered->toList() results in [2, 4]
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
      * @return IterOps<TKey, TVal>
      */
     public function filter(callable $predicate): IterOps;
 
     /**
+     * Works like {@see IterOps::filter()} except that it excludes the items that satisfy the given predicate.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $rejected = $items->reject(fn($n) => $n % 2 === 0);
+     * // $rejected->toList() results in [1, 3, 5]
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
      * @return IterOps<TKey, TVal>
      */
