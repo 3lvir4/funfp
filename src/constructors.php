@@ -16,6 +16,7 @@ use Elvir4\FunFp\Iter\GenerateIter;
 use Elvir4\FunFp\Iter\RepeatIter;
 use Elvir4\FunFp\Iter;
 use Elvir4\FunFp\Option;
+use Elvir4\FunFp\Pair;
 use Elvir4\FunFp\Pipe;
 use Elvir4\FunFp\Result;
 use Throwable;
@@ -97,6 +98,21 @@ function pipe(callable ...$functions): Pipe
 function iter(iterable $iterable): Result
 {
     return Result::try(static fn() => Iter::fromIterable($iterable));
+}
+
+/**
+ * Constructor function for a {@see Pair} instance.
+ *
+ * @template T0
+ * @template T1
+ *
+ * @param T0 $a
+ * @param T1 $b
+ * @return Pair<T0, T1>
+ */
+function pair(mixed $a, mixed $b): Pair
+{
+    return new Pair($a, $b);
 }
 
 /**
