@@ -210,6 +210,17 @@ interface IterOps
     public function dedupBy(callable $f): IterOps;
 
     /**
+     * Creates a new iterator that emits pairs containing each unique element from the original iterator along with the count.
+     * The count represents the number of times the element appeared consecutively in the original iterator before being
+     * deduplicated. It uses loose comparison if the values are objects (otherwise, it uses strict comparison).
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 1, 2, 2, 2, 3, 4, 4, 4, 4])->unwrap();
+     * $deduplicatedWithCount = $items->dedupWithCount();
+     * // $deduplicatedWithCount->toList() results in [pair(2, 1), pair(3, 2), pair(1, 3), pair(4, 4)]
+     * ```
+     *
      * @return IterOps<TKey, Pair<int, TVal>>
      */
     public function dedupWithCount(): IterOps;
