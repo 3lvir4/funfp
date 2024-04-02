@@ -20,6 +20,19 @@ interface IterOps
     # region Transformers
 
     /**
+     * Creates a new iterator which yields the results of calling the provided callable on every
+     * item of this iterator. The callable is given at most 3 arguments, in order: the value, the key and
+     * the iterator itself.
+     *
+     * Example:
+     * ```
+     * $items = iter([0,1,2,3,4])->unwrap();
+     * $mapped = $items->map(fn($n) => $n * 2);
+     * // $mapped->toList() results in [0,2,4,6,8]
+     * $mapped = $mapped->map(fn($n,$i) => $n + $i);
+     * // $mapped->toList() results in [0,3,6,9,12]
+     * ```
+     *
      * @template UVal
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
      * @return IterOps<TKey, UVal>
@@ -27,6 +40,16 @@ interface IterOps
     public function map(callable $f): IterOps;
 
     /**
+     * Acts like {@see IterOps::map()} except it applies the callable every multiple of the given $step argument.
+     * The first item of the iterator is always mapped.
+     *
+     * Example:
+     * ```
+     * $items = iter([0,1,2,3,4,5,6])->unwrap();
+     * $mapped = $items->mapEvery(2, fn($n) => $n * 2);
+     * // $mapped->toList() results in [0,1,4,3,8,5,12]
+     * ```
+     *
      * @template UVal
      * @param int $step
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
