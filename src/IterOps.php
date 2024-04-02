@@ -58,6 +58,20 @@ interface IterOps
     public function mapEvery(int $step, callable $f): IterOps;
 
     /**
+     * Creates a new iterator by applying a transformation function to each item of this iterator and
+     * flattening the resulting iterators into one. The transformation function is given at most 3 arguments,
+     * in order: the value, the key, and the iterator itself. It must return an iterable (e.g., an array or an iterator)
+     * that will be flattened into the resulting iterator.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3])->unwrap();
+     * $flatMapped = $items->flatMap(function ($n) {
+     *     return [$n, $n * 2];
+     * });
+     * // $flatMapped->toList() results in [1, 2, 2, 4, 3, 6]
+     * ```
+     *
      * @template UKey
      * @template UVal
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): iterable<UKey, UVal> $f
