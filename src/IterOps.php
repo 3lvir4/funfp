@@ -601,7 +601,7 @@ interface IterOps
     public function cycle(): IterOps;
 
     /**
-     * Runs the provided callable on each items of this instance without mutating it.
+     * Runs the provided callable on each item of this instance without mutating it.
      *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): void $f
      * @return IterOps<TKey, TVal>
