@@ -789,12 +789,30 @@ interface IterOps
     public function position(callable $predicate): Option;
 
     /**
+     * Checks if any value satisfies the given predicate.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5]);
+     * $result = $items->any(fn($value) => $value % 2 === 0);
+     * // $result is true since $items yields 2
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
      * @return bool
      */
     public function any(callable $predicate): bool;
 
     /**
+     * Checks if all values satisfy the given predicate.
+     *
+     * Example:
+     * ```
+     * $items = iter([2, 4, 6, 8, 10]);
+     * $result = $items->all(fn($value) => $value % 2 === 0);
+     * // $result is true since all values are even
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
      * @return bool
      */
