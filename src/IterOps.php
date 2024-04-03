@@ -226,6 +226,18 @@ interface IterOps
     public function dedupWithCount(): IterOps;
 
     /**
+     * Creates a new iterator that chunks elements of the original iterator into arrays based on the result of applying
+     * the given function $f to each element. Elements are chunked together if they produce the same result when
+     * $f is applied to them, and only consecutive elements with the same result are grouped together.
+     * If $preserveKeys is set to true, the keys of the original iterator are preserved in the resulting chunks.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 4, 7, 9, 12, 15, 17])->unwrap();
+     * $chunked = $items->chunkBy(fn($item) => $item % 2 === 0);
+     * // $chunked->toList() results in [[1], [2, 4], [7, 9], [12], [15, 17]]
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): mixed $f
      * @param bool $preserveKeys
      * @return IterOps<int, array<TVal>>
@@ -233,6 +245,31 @@ interface IterOps
     public function chunkBy(callable $f, bool $preserveKeys = false): IterOps;
 
     /**
+     * Streams the iterator in chunks, containing $count elements each, where each new chunk starts $step elements into the iterator.
+     * $step is optional and, if not passed, defaults to $count, i.e., chunks do not overlap.
+     * Chunking will stop as soon as the iterator ends or when it emits an incomplete chunk.
+     * If the last chunk does not have $count elements to fill the chunk, elements are taken from $leftover to fill in the chunk.
+     * If $leftover does not have enough elements to fill the chunk, then a partial chunk is returned with less than $count elements.
+     * If $discard is true, the last chunk is discarded unless it has exactly $count elements.
+     * If $preserveKeys is set to true, the keys of the original iterator are preserved in the resulting chunks.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5, 6])->unwrap();
+     * $chunked = $items->chunkEvery(2);
+     * // $chunked->toList() results in [[1, 2], [3, 4], [5, 6]]
+     *
+     * $chunked = $items->chunkEvery(2, 1);
+     * // $chunked->toList() results in [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6]]
+     *
+     * $items = iter([1, 2, 3, 4, 5, 6, 7])->unwrap();
+     * $chunked = $items->chunkEvery(3, leftover: [8, 9]);
+     * // $chunked->toList() results in [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+     *
+     * $chunked = $items->chunkEvery(3, discard: true);
+     * // $chunked->toList() results in [[1, 2, 3], [4, 5, 6]]
+     * ```
+     *
      * @param int $count
      * @param int|null $step
      * @param bool $discard
