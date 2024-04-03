@@ -302,6 +302,16 @@ interface IterOps
     public function concat(Iterator|IterOps ...$iterators): IterOps;
 
     /**
+     * Zips the elements of this iterator with the elements of another iterator or IterOps instance.
+     *
+     * Example:
+     * ```
+     * $items1 = iter(['a', 'b', 'c'])->unwrap();
+     * $items2 = iter([1, 2, 3])->unwrap();
+     * $zipped = $items1->zip($items2);
+     * // $zipped->toList() results in [pair('a', 1), pair('b', 2), pair('c', 3)]
+     * ```
+     *
      * @template UKey
      * @template UVal
      * @param Iterator<UKey, UVal>|IterOps<UKey, UVal> $iterator
@@ -322,6 +332,8 @@ interface IterOps
     public function interleaveShortest(Iterator|IterOps $iterator): IterOps;
 
     /**
+     * Works like {@see IterOps::zip()} but allow for more than one iterator/IterOps instance.
+     *
      * @param Iterator|IterOps ...$iterators
      * @return IterOps<array<int, mixed>, array<int, mixed>>
      */
