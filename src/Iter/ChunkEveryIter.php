@@ -31,6 +31,8 @@ class ChunkEveryIter implements Iterator, IterOps
 
     private bool $isLastItem = false;
 
+    private int $nbElements = 0;
+
     /**
      * @param Iterator<TKey, TVal> $iterator
      * @param int $count
@@ -86,6 +88,7 @@ class ChunkEveryIter implements Iterator, IterOps
                 : $this->currentChunk[] = $curr;
 
             $this->iterator->next();
+            $this->nbElements++;
         }
 
         $this->isLastItem = !$this->isLastItem && !$this->iterator->valid();
@@ -105,6 +108,10 @@ class ChunkEveryIter implements Iterator, IterOps
      */
     #[\Override] public function valid(): bool
     {
+        if (!$this->iterator->valid() && !$this->discard && !$this->isLastItem && $this->index * $this->step < $this->nbElements) {
+            $this->isLastItem = true;
+            return true;
+        }
         if ($this->isLastItem) {
             return !$this->discard;
         }
@@ -119,6 +126,7 @@ class ChunkEveryIter implements Iterator, IterOps
         $this->currentChunk = [];
         $this->index = -1;
         $this->iterator->rewind();
+        $this->nbElements = 0;
         $this->next();
     }
 

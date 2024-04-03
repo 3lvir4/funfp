@@ -261,6 +261,11 @@ class IterTest extends TestCase
             [[0, 1, 2, 3], [4, 5, 0, 0]],
             $nums->take(6)->chunkEvery(4, leftover: cycle([0])->unwrap())->toArray()
         );
+
+        $this->assertEquals(
+            [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5]],
+            $nums->take(6)->chunkEvery(2, 1)->toList()
+        );
     }
 
     public function test_flatten(): void
