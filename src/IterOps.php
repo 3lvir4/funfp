@@ -613,6 +613,17 @@ interface IterOps
     # region Consumers
 
     /**
+     * Applies the provided callable to each element of the iterator, starting with an initial value.
+     * The callable is given at most 3 arguments, in order: the accumulator, the value and the key.
+     * It returns the last accumulator.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $sum = $items->fold(0, fn($acc, $n) => $acc + $n);
+     * // $sum will be 15
+     * ```
+     *
      * @template U
      * @param U $initialValue
      * @param callable(U, TVal, TKey): U $f
@@ -621,6 +632,8 @@ interface IterOps
     public function fold(mixed $initialValue, callable $f): mixed;
 
     /**
+     * Works the same as {@see IterOps::fold()} but uses the first element as the initial value.
+     *
      * @param callable(TVal, TVal): TVal $f
      * @return Option<TVal>
      */
