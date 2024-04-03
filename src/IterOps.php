@@ -464,18 +464,47 @@ interface IterOps
     public function skipEvery(int $step):  IterOps;
 
     /**
+     * Creates a new IterOps instance that yields the first $n elements of this instance.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $taken = $items->take(3);
+     * // $taken->toList() results in [1, 2, 3]
+     * ```
+     *
      * @param int $n
      * @return IterOps<TKey, TVal>
      */
     public function take(int $n):  IterOps;
 
     /**
+     * Creates a new IterOps instance that yields elements from the start until the first element
+     * that doesn't satisfy the given predicate function.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $taken = $items->takeWhile(fn($val) => $val < 4);
+     * // $taken->toList() results in [1, 2, 3]
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
      * @return IterOps<TKey, TVal>
      */
     public function takeWhile(callable $predicate):  IterOps;
 
     /**
+     * Creates a new IterOps instance that yields every $step-th element of this instance.
+     * The first element is always included unless $step is equal to 0. $step must be positive.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $taken = $items->takeEvery(2);
+     * // $taken->toList() results in [1, 3, 5]
+     * ```
+     *
      * @param int<0, max> $step
      * @return IterOps<TKey, TVal>
      */
