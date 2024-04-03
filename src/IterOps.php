@@ -362,6 +362,22 @@ interface IterOps
     public function zipMultiple(Iterator|IterOps ...$iterators): IterOps;
 
     /**
+     * Lazily zips corresponding elements of iterable elements into a new iterator,
+     * transforming them with the provided callable as it goes.
+     *
+     * The callable is invoked with an array containing the current elements from each iterables,
+     * in the order they were provided. The resulting value from the callable is emitted by the new iterator.
+     *
+     * As such, $this needs to be iterating over iterables, if not, it will crash.
+     *
+     * Example:
+     * ```
+     * $numbers = iter([1, 2, 3])->unwrap();
+     * $letters = iter(['a', 'b', 'c'])->unwrap();
+     * $zipped = $numbers->zipWith(fn($arr) => implode('-', $arr));
+     * // $zipped->toList() results in ['1-a', '2-b', '3-c']
+     * ```
+     *
      * @template UVal
      * @param callable(array): UVal $f
      * @return IterOps<int, UVal>
