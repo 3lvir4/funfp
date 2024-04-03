@@ -561,12 +561,32 @@ interface IterOps
     public function intersperseWith(callable $sep): IterOps;
 
     /**
-     * Flattens one level of an iterator of iterators.
+     * Creates a new IterOps instance by flattening one level of iterables nesting in this instance.
+     * Any non-iterable element encountered will cause a crash.
+     *
+     * Example:
+     * ```
+     * $nested = iter([[1, 2], [3, 4], [5, 6]])->unwrap();
+     * $flattened = $nested->flatten();
+     * // $flattened->toList() results in [1, 2, 3, 4, 5, 6]
+     * ```
+     *
      * @return IterOps
      */
     public function flatten(): IterOps;
 
     /**
+     * Creates a new IterOps instance by sorting the elements using the provided comparator function.
+     * It is a convenient fluent shortcut which consume this instance before creating a new one. As such, like some other
+     * methods, it causes an infinite loop if this instance yields indefinitely.
+     *
+     * Example:
+     * ```
+     * $items = iter([3, 1, 4, 1, 5, 9, 2])->unwrap();
+     * $sorted = $items->sorted(fn($a, $b) => $a - $b);
+     * // $sorted->toList() results in [1, 1, 2, 3, 4, 5, 9]
+     * ```
+     *
      * @param callable(TVal, TVal): int $comparator
      * @param bool $preserveKeys
      * @return IterOps<TKey, TVal>
@@ -574,11 +594,15 @@ interface IterOps
     public function sorted(callable $comparator, bool $preserveKeys = true): IterOps;
 
     /**
+     * Creates a new IterOps instance which cycles infinitely over the items of this instance.
+     *
      * @return IterOps<TKey, TVal>
      */
     public function cycle(): IterOps;
 
     /**
+     * Runs the provided callable on each items of this instance without mutating it.
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): void $f
      * @return IterOps<TKey, TVal>
      */
