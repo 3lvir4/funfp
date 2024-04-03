@@ -640,7 +640,8 @@ interface IterOps
     public function reduce(callable $f): Option;
 
     /**
-     * Iterates over without doing anything else.
+     * Iterates over this instance without doing anything else.
+     *
      * @return void
      */
     public function run(): void;
@@ -684,6 +685,15 @@ interface IterOps
     public function toSortedArray(callable $comparator): array;
 
     /**
+     * Mirror to {@see IterOps::zip()} or {@see IterOps::zipMultiple()}. Returns a list of the zipped iterables.
+     *
+     * Example:
+     * ```
+     * $pairs = iter([pair(1, 'a'), pair(2, 'b'), pair(3, 'c')])->unwrap();
+     * [$nums, $abc] = $pairs->unzip();
+     * // $nums will be [1, 2, 3] and $abc will be ['a', 'b', 'c']
+     * ```
+     *
      * @return array<value-of<TVal>[]>
      */
     public function unzip(): array;
