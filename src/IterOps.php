@@ -417,18 +417,47 @@ interface IterOps
     public function positions(callable $predicate): IterOps;
 
     /**
+     * Creates a new IterOps instance that skips the first $n elements of this iterator.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $skipped = $items->skip(2);
+     * // $skipped->toList() results in [3, 4, 5]
+     * ```
+     *
      * @param int $n
      * @return IterOps<TKey, TVal>
      */
     public function skip(int $n):  IterOps;
 
     /**
+     * Creates a new IterOps instance that skips elements from the start until the first element
+     * that doesn't satisfy the given predicate.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $skipped = $items->skipWhile(fn($val) => $val < 3);
+     * // $skipped->toList() results in [3, 4, 5]
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
      * @return IterOps<TKey, TVal>
      */
     public function skipWhile(callable $predicate):  IterOps;
 
     /**
+     * Creates a new IterOps instance that skips every $step-th element of this iterator.
+     * The first element is always skipped unless $step is equal to 0. $step must be positive.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $skipped = $items->skipEvery(2);
+     * // $skipped->toList() results in [2, 4]
+     * ```
+     *
      * @param int $step
      * @return IterOps<TKey, TVal>
      */
