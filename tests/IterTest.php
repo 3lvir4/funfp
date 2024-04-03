@@ -174,6 +174,11 @@ class IterTest extends TestCase
         );
 
         $this->assertEquals(
+            ["1", "a", "2", "b", "3", "c", "d", "e", "f"],
+            $nums->interleave($i)->toList()
+        );
+
+        $this->assertEquals(
             ["a", "1", "b", "2", "c", "3", "d"],
             $i->interleaveShortest($nums)->toList()
         );

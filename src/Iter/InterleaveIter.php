@@ -44,21 +44,27 @@ class InterleaveIter extends IteratorIterator implements IterOps
     {
         return $this->interIter->valid() && $this->index % 2 !== 0
             ? $this->interIter->current()
-            : parent::current();
+            : (parent::valid()
+                ? parent::current()
+                : $this->interIter->current()
+            );
     }
 
     public function key(): mixed
     {
         return $this->interIter->valid() && $this->index % 2 !== 0
             ? $this->interIter->key()
-            : parent::key();
+            : (parent::valid()
+                ? parent::key()
+                : $this->interIter->key()
+            );
     }
 
     public function next(): void
     {
         ++$this->index % 2 === 0 && $this->interIter->valid()
             ? $this->interIter->next()
-            : parent::next();
+            : (parent::valid() ? parent::next() : $this->interIter->next());
     }
 
     public function valid(): bool
