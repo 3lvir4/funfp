@@ -6,7 +6,6 @@ namespace Elvir4\FunFp;
 
 use Elvir4\FunFp\Contracts\FromIterator;
 use Elvir4\FunFp\Contracts\TryFromIterator;
-use Elvir4\FunFp\Iter\IntersperseIter;
 use Iterator;
 use Throwable;
 
@@ -657,7 +656,7 @@ interface IterOps
     public function collect(string $dest): mixed;
 
     /**
-     * @template D
+     * @template D of TryFromIterator
      * @param class-string<D> $dest
      * @return Result<D, Throwable>
      */
