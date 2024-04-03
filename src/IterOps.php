@@ -270,11 +270,11 @@ interface IterOps
      * // $chunked->toList() results in [[1, 2, 3], [4, 5, 6]]
      * ```
      *
-     * @param int $count
-     * @param int|null $step
-     * @param bool $discard
-     * @param iterable<TKey, TVal> $leftover
-     * @param bool $preserveKeys
+     * @param int $count The number of elements in each chunk.
+     * @param int|null $step The number of elements to step between each chunk. Defaults to $count if not provided.
+     * @param bool $discard Whether to discard the last chunk if it does not have exactly $count elements.
+     * @param iterable<TKey, TVal> $leftover The iterable to use for filling incomplete chunks.
+     * @param bool $preserveKeys Whether to preserve keys in the resulting chunks.
      * @return IterOps<int, array<TVal>>
      */
     public function chunkEvery(
@@ -286,6 +286,16 @@ interface IterOps
     ): IterOps;
 
     /**
+     * Concatenates multiple iterators or IterOps instances into a single one.
+     *
+     * Example:
+     * ```
+     * $items1 = iter([1, 2, 3])->unwrap();
+     * $items2 = iter([4, 5, 6])->unwrap();
+     * $concatenated = $items1->concat($items2);
+     * // $concatenated->toList() results in [1, 2, 3, 4, 5, 6]
+     * ```
+     *
      * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> ...$iterators
      * @return IterOps<TKey, TVal>
      */
