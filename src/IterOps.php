@@ -739,6 +739,8 @@ interface IterOps
     public function join(string $separator = ""): string;
 
     /**
+     * Performs a {@see IterOps::map()} and a {@see IterOps::join()} operation in one go.
+     *
      * @template UVal
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): UVal $f
      * @param string $separator
@@ -747,30 +749,40 @@ interface IterOps
     public function mapJoin(callable $f, string $separator = ""): string;
 
     /**
+     * Returns the first value that satisfies the predicate.
+     *
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
      */
     public function find(callable $predicate): Option;
 
     /**
+     * Returns the last value that satisfies the predicate.
+     *
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
      */
     public function findLast(callable $predicate): Option;
 
     /**
+     * Returns the key of the first value that satisfies the predicate.
+     *
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
      */
     public function findKey(callable $predicate): Option;
 
     /**
+     * Returns the key of the last value that satisfies the predicate.
+     *
      * @param callable(TVal): bool $predicate
      * @return Option<TVal>
      */
     public function findLastKey(callable $predicate): Option;
 
     /**
+     * Returns the position (0-based) of the first value that satisfies the predicate.
+     *
      * @param callable(TVal): bool $predicate
      * @return Option<int>
      */
