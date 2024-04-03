@@ -385,12 +385,32 @@ interface IterOps
     public function zipWith(callable $f): IterOps;
 
     /**
+     * Creates a new IterOps instance where each element is a pair consisting of the index and the corresponding value
+     * from this iterator, starting from the specified integer (if given).
+     *
+     * Example:
+     * ```
+     * $items = iter(['a', 'b', 'c'])->unwrap();
+     * $enumerated = $items->enumerate();
+     * // $enumerated->toList() results in [pair(0, 'a'), pair(1, 'b'), pair(2, 'c')]
+     * ```
+     *
      * @param int $start
      * @return IterOps<TKey, Pair<int, TVal>>
      */
     public function enumerate(int $start = 0): IterOps;
 
     /**
+     * Creates a new IterOps instance where each element is the index of a value from this instance
+     * that satisfies the given predicate function.
+     *
+     * Example:
+     * ```
+     * $items = iter([1, 2, 3, 4, 5])->unwrap();
+     * $positions = $items->positions(fn($val) => $val % 2 === 0);
+     * // $positions->toList() results in [1, 3]
+     * ```
+     *
      * @param callable(TVal, TKey, Iterator<TKey, TVal>): bool $predicate
      * @return IterOps<int, TKey>
      */
