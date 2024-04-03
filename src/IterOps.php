@@ -11,8 +11,11 @@ use Iterator;
 use Throwable;
 
 /**
- * @template-covariant TKey
- * @template-covariant TVal
+ * The `IterOps` interface represents operations that can be performed on iterators of all kind.
+ * It provides methods for transforming, filtering, and consuming iterators.
+ *
+ * @template-covariant TKey The type of keys in the iterator.
+ * @template-covariant TVal The type of values in the iterator.
  * @psalm-suppress InvalidTemplateParam
  */
 interface IterOps
