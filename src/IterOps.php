@@ -320,12 +320,34 @@ interface IterOps
     public function zip(Iterator|IterOps $iterator): IterOps;
 
     /**
+     * Interleaves the elements of this iterator with the elements of another iterator or IterOps instance.
+     * Elements are alternated between both iterators until both of them runs out of elements.
+     *
+     * Example:
+     * ```
+     * $numbers = iter([1, 2, 3])->unwrap();
+     * $letters = iter(['a', 'b', 'c', 'd', 'e'])->unwrap();
+     * $interleaved = $numbers->interleave($letters);
+     * // $interleaved->toList() results in [1, 'a', 2, 'b', 3, 'c', 'd', 'e']
+     * ```
+     *
      * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> $iterator
      * @return IterOps<TKey, TVal>
      */
     public function interleave(Iterator|IterOps $iterator): IterOps;
 
     /**
+     * Interleaves the elements of this iterator with the elements of another iterator or IterOps instance.
+     * Elements are alternated between both iterators until at least one of them runs out of elements.
+     *
+     * Example:
+     * ```
+     * $numbers = iter([1, 2, 3])->unwrap();
+     * $letters = iter(['a', 'b'])->unwrap();
+     * $interleaved = $numbers->interleaveShortest($letters);
+     * // $interleaved->toList() results in [1, 'a', 2, 'b']
+     * ```
+     *
      * @param Iterator<TKey, TVal>|IterOps<TKey, TVal> $iterator
      * @return IterOps<TKey, TVal>
      */
